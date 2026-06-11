@@ -6,28 +6,56 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
-## Docs de référence à la racine, pas dans `docs/` (2026-06-11)
+## rtk intercepte `pnpm lint` (et d'autres scripts) (2026-06-11)
 
-**Découvert** : pendant le bootstrap de la mémoire projet.
+**Découvert** : pendant la vérification P1.
 
-**Symptôme** : `CLAUDE.md` (et `BOOTSTRAP-pazaak.md §1`) référencent `docs/contrat-pazaak.md`, `docs/RULES.md`, `docs/BOOTSTRAP.md`, `docs/ROADMAP.md`. Ces chemins n'existent pas.
+**Symptôme** : `pnpm lint` sort `ESLint output (JSON parse failed)` + `Command "eslint" not found`, alors que le script projet est `biome lint .`.
 
-**Cause** : les documents de référence sont physiquement à la **racine** du repo, avec un suffixe `-pazaak` : `contrat-pazaak.md`, `RULES-pazaak.md`, `BOOTSTRAP-pazaak.md`, `ROADMAP-pazaak.md`.
+**Cause** : `rtk` (Rust Token Killer) installe un wrapper shell autour de `pnpm` et intercepte certains noms de scripts (`lint`, probablement `test`/`build`) pour lancer son propre adaptateur (eslint-centré). Notre lint est Biome → l'adaptateur échoue.
 
-**Workaround** : lire les fichiers à la racine. Une normalisation est à trancher (déplacer dans `docs/` OU corriger les chemins de `CLAUDE.md`) — cf. `BACKLOG.md`.
+**Workaround** : préfixer `command` pour bypasser le wrapper (`command pnpm lint`, `command pnpm -r test`), ou appeler l'outil directement (`pnpm exec biome check .`). `pnpm format` n'est pas intercepté.
 
-**Référence** : `CLAUDE.md` (section « Protocole obligatoire ») · racine du repo
+**Référence** : `docs/ENVIRONMENT.md` (section Toolchain)
 
 ---
 
-## Repo non bootstrappé (2026-06-11)
+## pnpm 11 : réglages déplacés + nouvelle policy supply-chain (2026-06-11)
 
-**Découvert** : pendant le bootstrap de la mémoire projet.
+**Découvert** : en bumpant pnpm 10.28.1 → 11.5.3.
 
-**Symptôme** : les commandes `pnpm lint/typecheck/test/dev` de `CLAUDE.md` échouent — aucun `package.json` n'existe.
+**Symptômes & causes** :
+- `save-exact` n'est plus lu depuis `.npmrc` → les `pnpm add` réécrivaient des `^`. **Fix** : `saveExact: true` dans `pnpm-workspace.yaml`.
+- `pnpm.onlyBuiltDependencies` (package.json) ignoré ; la liste `onlyBuiltDependencies` dans `pnpm-workspace.yaml` n'a pas non plus autorisé le build natif. La **bonne clé pnpm 11 est `allowBuilds`** (map `nom: true|false`). **Fix** : `allowBuilds: { better-sqlite3: true, esbuild: true }`.
+- Policy **`minimumReleaseAge`** active : refuse tout package publié trop récemment. `@types/node@25.9.3` (publié il y a ~2h) bloquait l'install. **Fix** : `overrides: { "@types/node": "24.0.0" }` (ligne 24.x, alignée runtime, suffisamment datée). Le peer optionnel de vite/vitest tirait sinon le dernier `@types/node`.
+- Changement de major du store → `pnpm install` veut purger `node_modules` mais refuse sans TTY (`ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY`). **Fix** : `CI=true pnpm install` (ou `confirmModulesPurge=false`).
 
-**Cause** : le projet est au tout début (commit initial). La structure monorepo (`packages/`, `apps/`, `pnpm-workspace.yaml`, `tsconfig.base.json`) n'a pas encore été créée. Phase ROADMAP : avant P0.
+**Référence** : `pnpm-workspace.yaml`
 
-**Workaround** : exécuter d'abord la phase P0 (`BOOTSTRAP-pazaak.md §2`) avant d'attendre quoi que ce soit de ces scripts.
+---
 
-**Référence** : `BOOTSTRAP-pazaak.md:42` (section Initialisation)
+## Host Node 23 par défaut, projet en Node 24 (2026-06-11)
+
+**Découvert** : au bootstrap P1.
+
+**Symptôme** : `node -v` dans un shell neuf renvoie `v23.11.1` (et `pnpm` absent tant que corepack n'a pas shimé le Node courant), malgré `nvm alias default 24`.
+
+**Cause** : le profil du host force Node 23. `.nvmrc` du projet pointe sur `v24.16.0`.
+
+**Workaround** : `export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"; nvm use && corepack enable` avant toute commande pnpm/node.
+
+**Référence** : `.nvmrc`, `docs/ENVIRONMENT.md`
+
+---
+
+## ~~Docs de référence à la racine~~ — RÉSOLU (2026-06-11)
+
+Les docs (`contrat-pazaak.md`, `RULES.md`, `BOOTSTRAP.md`, `ROADMAP.md`) ont été déplacées
+dans `docs/` (`git mv`), conformément aux chemins de `CLAUDE.md`. Plus de divergence.
+
+---
+
+## ~~Repo non bootstrappé~~ — RÉSOLU (2026-06-11)
+
+P1 livré : structure pnpm workspaces, tooling, placeholders, tests verts. Les commandes
+de `CLAUDE.md` sont opérationnelles (avec Node 24 actif, cf. quirk Node ci-dessus).

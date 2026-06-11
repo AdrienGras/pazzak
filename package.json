@@ -1,0 +1,24 @@
+{
+	"name": "pazaak",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"packageManager": "pnpm@11.5.3+sha512.7ac1c919341c213a34dc0d02afb7143c5c26ac26ee8c4782deea821b8ac64d2134a081fd8941dae6e29bbb48f58dfc2b7fbceeccc07cb2f09d219d342a4969ed",
+	"engines": {
+		"node": ">=24"
+	},
+	"scripts": {
+		"lint": "biome lint .",
+		"format": "biome format --write .",
+		"format:check": "biome format .",
+		"check": "biome check .",
+		"typecheck": "pnpm -r typecheck",
+		"test": "pnpm -r test",
+		"dev": "pnpm -r --parallel --filter @pazaak/web --filter @pazaak/game-server dev",
+		"e2e": "pnpm --filter @pazaak/e2e e2e"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.16",
+		"typescript": "6.0.3"
+	}
+}

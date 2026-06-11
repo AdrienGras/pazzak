@@ -1,0 +1,33 @@
+# Stack prod-like (squelette P1) — services déclarés, Dockerfiles finalisés en P5.
+# Réseau interne pazaak-net : seuls le front (web) et le websocket (game-server) sont publiés.
+# Le Lobby API et /api/internal/* ne sortent jamais du réseau Docker (contrat §1).
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile # TODO P5
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      SESSION_SECRET: ${SESSION_SECRET:?set in .env.local}
+      SETTLEMENT_SECRET: ${SETTLEMENT_SECRET:?set in .env.local}
+      GAME_SERVER_URL: http://game-server:8000
+      DATABASE_PATH: /app/data/pazaak.db
+    networks:
+      - pazaak-net
+
+  game-server:
+    build:
+      context: .
+      dockerfile: apps/game-server/Dockerfile # TODO P5
+    ports:
+      - "${GAME_SERVER_PORT:-8000}:8000"
+    environment:
+      SETTLEMENT_SECRET: ${SETTLEMENT_SECRET:?set in .env.local}
+    networks:
+      - pazaak-net
+
+networks:
+  pazaak-net:
+    driver: bridge

@@ -6,6 +6,28 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 
 ---
 
+## 2026-06-11 — P1 Bootstrap monorepo livré
+
+### Dernière chose faite
+- **P1 complet** sur la branche `feat/p1-bootstrap-monorepo` : pnpm workspaces (`@pazaak/engine`, `@pazaak/shared`, `@pazaak/web`, `@pazaak/game-server`, `@pazaak/e2e`), `tsconfig.base.json` strict, Biome (lint+format), Vitest par package + placeholder test, Playwright dans `e2e`, `docker-compose.yml` + `.dev.yml` squelettes, `.env.example`, `.gitignore`.
+- **Critères de sortie verts** : `pnpm install --frozen-lockfile`, `biome check`, `pnpm -r typecheck`, `pnpm -r test` (4 packages, e2e exclu) tous RC=0.
+- Décisions de session : **Node 24 LTS** (était 22 au contrat — docs mises à jour), **pnpm 11.5.3** (bump depuis 10.28.1), **tout Biome** (oxlint envisagé puis abandonné). Docs de référence déplacées dans `docs/`.
+
+### Trucs en suspens
+- **Toolchain** : Node 24 via nvm obligatoire (host par défaut Node 23). `pnpm lint` doit passer par `command pnpm` (rtk l'intercepte). Voir `QUIRKS.md` + `ENVIRONMENT.md`.
+- **argon2** non installé (P4), **Playwright browsers** non installés (P7), **TanStack Start** épinglé mais non câblé (P3). Voir `BACKLOG.md`.
+- Workflow PR abandonné : **on merge la branche dans `main` en fin de livraison** (`--no-ff`, pas de PR). PR #1 fermée, branche P1 mergée dans `main`.
+
+### Prochaine chose à creuser
+- **P2 — Engine** (★ cœur) : types `G`, phase `pickSideDeck`, boucle de set/match, moves, `playerView`, IA, tests Vitest + fast-check (≥1000 runs). Résoudre `boardgame.io` via Context7 **avant** de coder.
+
+### Notes pour future Claude
+- Avant toute commande : `export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"; nvm use && corepack enable`.
+- Réglages pnpm dans `pnpm-workspace.yaml` (`saveExact`, `allowBuilds`, `overrides`), pas `.npmrc`.
+- Le contrat fait loi ; pureté d'`engine` (TS pur + `boardgame.io`, aléa via `ctx.random`).
+
+---
+
 ## 2026-06-11 — Init mémoire projet
 
 ### Dernière chose faite

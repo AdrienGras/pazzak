@@ -1,0 +1,21 @@
+packages:
+  - "packages/*"
+  - "apps/*"
+  - "e2e"
+
+# Versions structurantes épinglées exactes (BOOTSTRAP §2). pnpm 11 ne lit plus
+# save-exact depuis .npmrc : le réglage vit ici.
+saveExact: true
+
+# Fige @types/node sur la ligne 24.x (alignée sur le runtime Node 24). Sans ça,
+# le peer optionnel de vite/vitest résout vers le dernier @types/node publié, ce qui
+# casse la policy supply-chain minimumReleaseAge de pnpm (version trop fraîche).
+overrides:
+  "@types/node": "24.0.0"
+
+# Dépendances autorisées à exécuter leurs scripts de build natif (pnpm 11 bloque par
+# défaut). better-sqlite3 : module natif (P4). esbuild : pulled par Vite/TanStack (P3).
+# argon2 sera ajouté ici quand il arrivera en P4.
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true

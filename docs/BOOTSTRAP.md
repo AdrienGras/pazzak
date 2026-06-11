@@ -33,18 +33,18 @@ pazaak/
 └── e2e/                          # Playwright (hors workspaces applicatifs)
 ```
 
-**Outillage** : Node 22 (fixé via `.nvmrc` + `engines`), **pnpm** (workspaces natifs,
-pas de Turborepo — 4 packages ne justifient pas un orchestrateur de build),
-**TypeScript strict partout**, **Biome** (lint + format, config unique à la racine),
-**Vitest** (unit/intégration), **fast-check** (property-based, engine uniquement),
-**Playwright** (e2e).
+**Outillage** : Node 24 LTS (`lts/krypton`, fixé via `.nvmrc` + `engines`), **pnpm**
+(workspaces natifs, pas de Turborepo — 4 packages ne justifient pas un orchestrateur de
+build), **TypeScript strict partout**, **Biome** (lint + format, config unique à la
+racine), **Vitest** (unit/intégration), **fast-check** (property-based, engine
+uniquement), **Playwright** (e2e).
 
 ## 2. Initialisation
 
 ```bash
 mkdir pazaak && cd pazaak && git init
 corepack enable && corepack use pnpm@latest
-node -v > .nvmrc            # doit afficher v22.x
+node -v > .nvmrc            # doit afficher v24.x (lts/krypton)
 pnpm init                   # puis "private": true dans package.json
 ```
 
@@ -129,7 +129,7 @@ Zéro logique, zéro dépendance.
 
 ## 7. Docker
 
-- 2 Dockerfiles (`apps/web`, `apps/game-server`), base `node:22-slim`, build pnpm
+- 2 Dockerfiles (`apps/web`, `apps/game-server`), base `node:24-slim`, build pnpm
   avec `--filter` depuis la racine.
 - `docker-compose.yml` : réseau interne `pazaak-net` ; seuls les ports du front et du
   websocket sont publiés. `SETTLEMENT_SECRET` partagé via env, jamais committé.

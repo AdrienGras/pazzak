@@ -59,3 +59,42 @@ function describe(card: SideCard): string {
 ### Règles tacites
 - `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes` actifs : indexer un objet/array renvoie `T | undefined` — gérer le cas.
 - `verbatimModuleSyntax` : utiliser `import type` pour les imports de types uniquement.
+
+---
+
+## Package de workspace — squelette (P1)
+
+Tout nouveau package du monorepo suit ce gabarit.
+
+`packages/<nom>/package.json` :
+```json
+{
+  "name": "@pazaak/<nom>",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}
+```
+
+`packages/<nom>/tsconfig.json` :
+```json
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["src", "test"]
+}
+```
+
+### Règles tacites
+- **ESM partout** (`"type": "module"`), source TS consommée directement entre packages via `exports` (`./src/index.ts`) — pas de build intermédiaire.
+- Deps inter-packages en **`workspace:*`** (ex. `"@pazaak/engine": "workspace:*"`). En zsh, **quoter** la spec lors d'un `pnpm add` (`'@pazaak/engine@workspace:*'`) sinon le `*` est glob-expansé.
+- **Versions exactes** (pas de `^`) — garanti par `saveExact: true` dans `pnpm-workspace.yaml`.
+- Imports de tests **extensionless** (`from "../src/index"`), résolus par `moduleResolution: bundler` + Vitest.
+- Un package qui n'entre pas dans `pnpm test` (ex. `e2e`) **n'a pas de script `test`** (il expose `e2e` à la place).
+- `imports` de `vitest` → le package doit déclarer `vitest` en devDep (sinon `tsc` échoue sur la résolution du module).
