@@ -16,7 +16,7 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 ### Trucs en suspens
 - **Toolchain** : Node 24 via nvm obligatoire (host par défaut Node 23). `pnpm lint` doit passer par `command pnpm` (rtk l'intercepte). Voir `QUIRKS.md` + `ENVIRONMENT.md`.
 - **argon2** non installé (P4), **Playwright browsers** non installés (P7), **TanStack Start** épinglé mais non câblé (P3). Voir `BACKLOG.md`.
-- Pas encore de PR ouverte au moment d'écrire (commit P1 à faire sur la branche).
+- PR ouverte : **#1** (`feat/p1-bootstrap-monorepo` → `main`), commit `6ede018`. En attente de review/merge.
 
 ### Prochaine chose à creuser
 - **P2 — Engine** (★ cœur) : types `G`, phase `pickSideDeck`, boucle de set/match, moves, `playerView`, IA, tests Vitest + fast-check (≥1000 runs). Résoudre `boardgame.io` via Context7 **avant** de coder.
