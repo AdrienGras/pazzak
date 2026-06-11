@@ -10,7 +10,7 @@ Carte des paths, conteneurs, services, accès. À jour au fil des découvertes.
 
 - **Path hôte** : `/srv/AdrienGras/pazzak`
 - **Branche par défaut** : `main`
-- **Convention de merge** : feature branches + conventional commits (`feat(engine): …`). Ne jamais commiter directement sur `main` sans demande.
+- **Convention de merge** : feature branches + conventional commits (`feat(engine): …`), **mergées dans `main` en fin de livraison (`--no-ff`, pas de PR)**. Ne jamais commiter directement sur `main`.
 - **État** : monorepo **bootstrappé (P1 fait)**. Structure pnpm workspaces en place, placeholders + tests verts. Prochaine phase ROADMAP : **P2 (engine)**.
 
 ## Toolchain (IMPORTANT)
