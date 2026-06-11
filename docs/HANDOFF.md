@@ -6,6 +6,42 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 
 ---
 
+## 2026-06-11 — P2 Engine livré ★
+
+### Dernière chose faite
+- **P2 complet** (branche `feat/p2-engine`) : noyau Pazaak en TDD strict.
+  - `deck.ts`, `scoring.ts` (+ `setOutcome`), `types.ts` (schéma `G` contrat §3).
+  - `game.ts` : `pickSideDeck` (pick simultané, main de 4, 1er joueur) + phase `play`
+    complète (pioche auto, `turn.order` custom non-alternant, `playCard`/`endTurn`/`stand`,
+    résolution de set, boucle de match **best-of-3**, `endIf`).
+  - `playerView.ts` (contrat §4) + test contractuel de non-fuite (sentinelles gold).
+  - `invariants.test.ts` : fast-check **1000 runs** verts (RULES §7), ~1.7s.
+  - `index.ts` : API publique. `support.ts` : harnais headless typé.
+- **Critères de sortie P2 atteints** : match complet jouable en client local headless ;
+  50 tests verts ; lint + typecheck verts ; invariants ≥1000 runs.
+
+### Trucs en suspens
+- **IA non implémentée** : `ai.ts` (contrat §6) relève de **P3** (pas un critère P2). Le plan
+  P2 la listait mais la ROADMAP la place en P3.
+- **Gold cards** (tiebreaker, double, 1±2, flips) : types présents, **non jouables** (P8).
+  `playCard` rejette toute carte non-`standard`. `[À VALIDER]` flip cards toujours ouvert.
+- **Quirk outillage** : `pnpm format` ne lance PAS le lint/organizeImports → toujours finir
+  par `command pnpm exec biome check .` (cf. QUIRKS).
+
+### Prochaine chose à creuser
+- **P3 — Solo client-local** : `ai.ts` heuristique (stand 18-20, jouer si 20/évite bust)
+  + écrans `apps/web` (pick, board, fin de set/match). Résoudre `@tanstack/react-start`
+  via Context7 avant le front.
+
+### Notes pour future Claude
+- Modélisation boardgame.io : un seul phase `play` boucle les sets ; `nextActivePos`
+  gère les tours non alternés (adversaire continue seul) + le redémarrage de set (fresh).
+  Résolution de set centralisée dans `resolveSetIfOver` (turn.onEnd).
+- Tests : logique de règles pure testée en direct (`setOutcome`, `playCard` en appel
+  direct déterministe) ; flux boardgame.io testé via Client `Local()` seedé.
+
+---
+
 ## 2026-06-11 — P1 Bootstrap monorepo livré
 
 ### Dernière chose faite

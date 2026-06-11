@@ -98,3 +98,31 @@ Tout nouveau package du monorepo suit ce gabarit.
 - Imports de tests **extensionless** (`from "../src/index"`), résolus par `moduleResolution: bundler` + Vitest.
 - Un package qui n'entre pas dans `pnpm test` (ex. `e2e`) **n'a pas de script `test`** (il expose `e2e` à la place).
 - `imports` de `vitest` → le package doit déclarer `vitest` en devDep (sinon `tsc` échoue sur la résolution du module).
+
+---
+
+## Tests du moteur (`packages/engine`) — patterns
+
+Deux niveaux de test, complémentaires (établis en P2) :
+
+1. **Logique de règles pure → appel direct, déterministe.** Les fonctions pures
+   (`scoreBoard`, `setOutcome`) et les moves (`playCard`) se testent en les appelant
+   directement sur un `G` fabriqué, sans framework — pas de pioche auto à gérer :
+   ```ts
+   const r = (playCard as unknown as (c: unknown, ...a: unknown[]) => unknown)(
+     { G, ctx: { currentPlayer: "0" }, playerID: "0" }, handIndex, declaration,
+   );
+   expect(r).toBe(INVALID_MOVE);
+   ```
+2. **Flux boardgame.io → Client headless seedé** via `test/support.ts`
+   (`makeClients`/`reachPlay`/`move`/`player`). Déterminisme par `seed` sur le Game.
+   `noUncheckedIndexedAccess` oblige : passer par les helpers `player()`/`getState()` qui
+   narrowent en lançant une erreur claire, plutôt que des `!`.
+3. **Invariants → fast-check** (`fc.assert(fc.property(...), { numRuns: 1000 })`), en jouant
+   des parties aléatoires et en vérifiant après chaque coup (RULES §7).
+
+### Règles tacites
+- `playerView` actif : un client ne voit que SON joueur en entier → lire `players['0']`
+  depuis `p0`, `players['1']` depuis `p1`. Pour l'état brut (setup), tester `initialState()`.
+- Pour vérifier l'absence de fuite secret state : sentinelles (cartes gold dans l'état
+  adverse) + `JSON.stringify(view)` ne doit pas les contenir.
