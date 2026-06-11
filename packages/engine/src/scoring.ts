@@ -1,4 +1,4 @@
-import type { PlayedCard } from "./types";
+import type { PlayedCard, PlayerState } from "./types";
 
 /** Contribution signée d'une carte posée au score du plateau. */
 export function cardContribution(card: PlayedCard): number {
@@ -37,4 +37,34 @@ export function betterScore(a: number, b: number): "a" | "b" | "tie" {
 		return "b";
 	}
 	return "tie";
+}
+
+/**
+ * Issue d'un set entre deux joueurs `a` et `b` (RULES §5). Renvoie :
+ * - `"a"` / `"b"` : vainqueur du set ;
+ * - `"tie"` : double stand à égalité → set rejoué ;
+ * - `null` : le set n'est pas encore terminé.
+ *
+ * Priorité : bust (perte immédiate) → 9 cartes (victoire immédiate) → double stand.
+ */
+export function setOutcome(
+	a: PlayerState,
+	b: PlayerState,
+): "a" | "b" | "tie" | null {
+	if (a.busted) {
+		return "b";
+	}
+	if (b.busted) {
+		return "a";
+	}
+	if (hasNineCards(a.board)) {
+		return "a";
+	}
+	if (hasNineCards(b.board)) {
+		return "b";
+	}
+	if (a.standing && b.standing) {
+		return betterScore(a.score, b.score);
+	}
+	return null;
 }

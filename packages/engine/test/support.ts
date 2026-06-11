@@ -1,6 +1,7 @@
 import type { Ctx } from "boardgame.io";
 import { Client } from "boardgame.io/client";
 import { Local } from "boardgame.io/multiplayer";
+import { standardSideCardCatalogue } from "../src/deck";
 import { PazaakGame } from "../src/game";
 import type { G, PlayerState } from "../src/types";
 
@@ -66,4 +67,31 @@ export function move(
 		);
 	}
 	fn(...args);
+}
+
+/** Pick valide (10 premières cartes standard du catalogue). */
+export function pickValid(client: TestClient): void {
+	move(client, "pickSideDeck", standardSideCardCatalogue().slice(0, 10));
+}
+
+/** Amène les deux joueurs jusqu'à la phase play (pick valide des deux côtés). */
+export function reachPlay(seed = "seed"): { p0: TestClient; p1: TestClient } {
+	const { p0, p1 } = makeClients(seed);
+	pickValid(p0);
+	pickValid(p1);
+	return { p0, p1 };
+}
+
+/** Le client dont c'est le tour (selon ctx.currentPlayer). */
+export function currentClient(p0: TestClient, p1: TestClient): TestClient {
+	return getState(p0).ctx.currentPlayer === "0" ? p0 : p1;
+}
+
+/** Le client possédant le joueur `id`. */
+export function clientOf(
+	p0: TestClient,
+	p1: TestClient,
+	id: string,
+): TestClient {
+	return id === "0" ? p0 : p1;
 }

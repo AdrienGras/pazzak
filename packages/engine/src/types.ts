@@ -37,3 +37,19 @@ export interface G {
 	setStarter: PlayerID; // tirage au set 1, alternance ensuite
 	matchWinner: PlayerID | null;
 }
+
+// --- Vue strippée envoyée au client (contrat §4) ---
+
+/** État adverse vu par un joueur : side deck masqué, main réduite à un compte. */
+export type OpponentView = Omit<PlayerState, "sideDeck" | "hand"> & {
+	sideDeck: null;
+	hand: { count: number };
+};
+
+export interface PlayerViewG {
+	players: Record<PlayerID, PlayerState | OpponentView>;
+	mainDeck: { remaining: number };
+	currentSet: number;
+	setStarter: PlayerID;
+	matchWinner: PlayerID | null;
+}
