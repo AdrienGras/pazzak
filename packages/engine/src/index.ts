@@ -1,3 +1,25 @@
-// Noyau du jeu Pazaak : G, phases, moves, playerView, IA (contrat §3–6).
-// Implémenté en P2. Ce placeholder existe pour valider l'outillage P1.
-export const ENGINE_PLACEHOLDER = true;
+// API publique du moteur Pazaak (contrat §11, BOOTSTRAP §3).
+// L'IA (ai.ts) sera ajoutée en P3.
+
+export { createMainDeck, standardSideCardCatalogue } from "./deck";
+export { initialState, PazaakGame } from "./game";
+export { playerView } from "./playerView";
+export {
+	betterScore,
+	hasNineCards,
+	isBust,
+	isTwenty,
+	scoreBoard,
+	setOutcome,
+} from "./scoring";
+export type {
+	G,
+	OpponentView,
+	PlayedCard,
+	PlayerID,
+	PlayerState,
+	PlayerViewG,
+	SideCard,
+	Sign,
+	StandardValue,
+} from "./types";

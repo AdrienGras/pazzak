@@ -6,6 +6,24 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## `pnpm format` ne couvre pas le lint/organizeImports (2026-06-11)
+
+**Découvert** : pendant P2.
+
+**Symptôme** : `pnpm format` passe vert, mais `biome check` échoue ensuite (règles
+`useOptionalChain`, `organizeImports`, imports non triés…).
+
+**Cause** : `pnpm format` = `biome format --write` (mise en forme **uniquement**). Le lint
+et les actions d'assist (tri des imports) relèvent de `biome check`, pas de `format`.
+
+**Workaround** : avant de considérer un chantier terminé, lancer `command pnpm exec biome
+check .` (le `command` bypasse l'interception rtk de `pnpm lint`). `biome check --write`
+applique les correctifs sûrs ; `--unsafe` pour les correctifs marqués unsafe (ex. optional chain).
+
+**Référence** : `docs/ENVIRONMENT.md` (Toolchain), `package.json` scripts
+
+---
+
 ## rtk intercepte `pnpm lint` (et d'autres scripts) (2026-06-11)
 
 **Découvert** : pendant la vérification P1.
