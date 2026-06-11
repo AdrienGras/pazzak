@@ -1,0 +1,26 @@
+{
+	"name": "@pazaak/web",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "echo '[web] serveur de dev TanStack Start — branché en P3'",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@pazaak/engine": "workspace:*",
+		"@pazaak/shared": "workspace:*",
+		"@tanstack/react-query": "5.101.0",
+		"@tanstack/react-router": "1.170.15",
+		"@tanstack/react-start": "1.168.25",
+		"better-sqlite3": "12.10.0",
+		"boardgame.io": "0.50.2",
+		"react": "19.2.7",
+		"react-dom": "19.2.7",
+		"zustand": "5.0.14"
+	},
+	"devDependencies": {
+		"vitest": "4.1.8"
+	}
+}

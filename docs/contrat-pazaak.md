@@ -230,7 +230,7 @@ changement de contrat = mise à jour de ce document d'abord.
 
 Vite + React, TanStack Start (figer la version exacte au premier install), TanStack
 Router/Query, Zustand, boardgame.io, better-sqlite3, argon2, fast-check (dev, engine).
-Node 22 (`node:22-slim`, build natif better-sqlite3 sur la même base).
+Node 24 LTS / `lts/krypton` (`node:24-slim`, build natif better-sqlite3 sur la même base).
 
 ---
 

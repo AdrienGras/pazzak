@@ -10,11 +10,13 @@ Voir aussi : `ENVIRONMENT.md` · `QUIRKS.md` · `BACKLOG.md` · `HANDOFF.md` · 
 
 | Feature | Date | Spec | Plan | Statut | Notes |
 |---|---|---|---|---|---|
+| **P1 — Bootstrap monorepo** | 2026-06-11 | `ROADMAP.md` §P1 | — | ✅ Livré | pnpm workspaces (engine/shared/web/game-server/e2e), TS strict, Biome, Vitest, Playwright, docker-compose squelettes. `install`/lint/typecheck/test verts. Node 24, pnpm 11. |
 | Système de mémoire projet (`docs/` + hook SessionStart) | 2026-06-11 | — | — | ✅ Livré | Bootstrap KB opérationnelle + hook d'injection `HANDOFF`/`INDEX` |
-| Docs de référence (contrat, RULES, BOOTSTRAP, ROADMAP) | 2026-06-11 | — | — | ✅ Pré-existant | À la racine du repo (cf. QUIRKS sur les paths) |
+| Docs de référence (contrat, RULES, BOOTSTRAP, ROADMAP) | 2026-06-11 | — | — | ✅ Livré | Déplacées dans `docs/` (P1) |
 
 ## Commandes / scripts utilitaires
 
 | Commande | Date | Cible |
 |---|---|---|
 | `.claude/hooks/load-memory.sh` | 2026-06-11 | Hook SessionStart : injecte les têtes de `HANDOFF.md` + `INDEX.md` |
+| `pnpm lint` / `format` / `typecheck` / `test` / `dev` / `e2e` | 2026-06-11 | Scripts d'orchestration racine (cf. `ENVIRONMENT.md` ; `pnpm lint` à lancer via `command pnpm` à cause de rtk) |

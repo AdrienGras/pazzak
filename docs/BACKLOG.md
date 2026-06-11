@@ -6,10 +6,14 @@ Une fois faite, déplace-la en `INDEX.md` (livré) ou supprime-la (abandonnée).
 
 ---
 
-## Documentation
+## Outillage / deps
 
-- [ ] Normaliser l'emplacement des docs de référence : soit déplacer `contrat-pazaak.md` / `RULES-pazaak.md` / `BOOTSTRAP-pazaak.md` / `ROADMAP-pazaak.md` dans `docs/` (et les renommer en `contrat-pazaak.md`, `RULES.md`, `BOOTSTRAP.md`, `ROADMAP.md`), soit corriger les chemins dans `CLAUDE.md`. Voir `QUIRKS.md`.
+- [ ] **argon2** : ajouter `argon2: true` à `allowBuilds` (pnpm-workspace.yaml) et l'épingler quand l'auth web arrive (P4). Pas installé en P1 (hors liste de pin P1).
+- [ ] **Playwright browsers** : `pnpm --filter @pazaak/e2e exec playwright install` avant de lancer les vrais e2e (P7). Le package est installé, pas les navigateurs.
+- [ ] **TanStack Start** : épinglé en P1 mais non câblé (pas de vite config / routes / plugin react). Wiring complet en P3 — résoudre la doc via Context7 avant.
+- [ ] **`@types/node`** : figé à `24.0.0` via override (policy `minimumReleaseAge` de pnpm). Revisiter si une 24.x plus récente et « datée » est souhaitée.
+- [ ] **Vitest config web** : passer `environment: jsdom` quand des tests de composants arriveront (actuellement node ; mais l'UI est couverte par les e2e P7, pas de tests de composants prévus).
 
-## Outillage
+## Docker
 
-- [ ] Exécuter la phase P0 de la ROADMAP (init monorepo pnpm + tsconfig + biome) pour rendre les commandes de `CLAUDE.md` opérationnelles.
+- [ ] Dockerfiles `apps/web` et `apps/game-server` (base `node:24-slim`) — finalisés en P5. Les services compose sont déclarés mais ne buildent pas encore.

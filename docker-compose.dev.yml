@@ -1,0 +1,19 @@
+# Override dev (squelette P1) : volumes montés + hot reload, mêmes variables que prod.
+# Usage : docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  web:
+    command: pnpm --filter @pazaak/web dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+
+  game-server:
+    command: pnpm --filter @pazaak/game-server dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development

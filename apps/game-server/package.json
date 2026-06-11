@@ -1,0 +1,21 @@
+{
+	"name": "@pazaak/game-server",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "echo '[game-server] serveur Koa boardgame.io — branché en P5'",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run"
+	},
+	"devDependencies": {
+		"@types/node": "24.0.0",
+		"vitest": "4.1.8"
+	},
+	"dependencies": {
+		"@pazaak/engine": "workspace:*",
+		"@pazaak/shared": "workspace:*",
+		"boardgame.io": "0.50.2",
+		"koa": "3.2.1"
+	}
+}

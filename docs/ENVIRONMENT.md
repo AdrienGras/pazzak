@@ -10,46 +10,61 @@ Carte des paths, conteneurs, services, accès. À jour au fil des découvertes.
 
 - **Path hôte** : `/srv/AdrienGras/pazzak`
 - **Branche par défaut** : `main`
-- **Convention de merge** : feature branches + conventional commits (`feat(engine): …`, `fix(web): …`). Ne jamais commiter directement sur `main` sans demande.
-- **État** : monorepo **pas encore bootstrappé** au 2026-06-11 (aucun `package.json` / `packages/` / `apps/` ; seulement les docs de référence). Phase ROADMAP courante : avant P0.
+- **Convention de merge** : feature branches + conventional commits (`feat(engine): …`). Ne jamais commiter directement sur `main` sans demande.
+- **État** : monorepo **bootstrappé (P1 fait)**. Structure pnpm workspaces en place, placeholders + tests verts. Prochaine phase ROADMAP : **P2 (engine)**.
 
-## Stack d'exécution
+## Toolchain (IMPORTANT)
 
-- **Runtime** : Node 22 (épinglé via `.nvmrc` + `engines`), gestionnaire **pnpm** (workspaces natifs, pas de Turborepo).
-- **Langage** : TypeScript strict partout, ESM (`"type": "module"`).
-- **Outillage** : Biome (lint + format, config unique racine), Vitest (unit/intégration), fast-check (property-based, engine only), Playwright (e2e).
-- **Comment lancer une commande** : depuis la racine ; cibler un package avec `pnpm --filter <pkg> <cmd>`.
+- **Node 24 LTS** (`lts/krypton`, exact `v24.16.0`) — épinglé via `.nvmrc`. Le **shell de login du host démarre par défaut sur Node 23** : avant toute commande `pnpm`/`node`, faire :
+  ```bash
+  export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"; nvm use   # lit .nvmrc -> v24.16.0
+  corepack enable                                            # shime pnpm pour ce Node
+  ```
+- **pnpm 11.5.3** (via corepack, champ `packageManager`). Workspaces natifs, pas de Turborepo.
+- **Réglages pnpm** : vivent dans `pnpm-workspace.yaml` (pnpm 11 ne lit plus `.npmrc`/`package.json#pnpm` pour ça) : `saveExact: true`, `allowBuilds` (scripts natifs autorisés), `overrides` (`@types/node` figé 24.x).
+- **rtk** (Rust Token Killer) wrappe le shell : `pnpm lint` est **intercepté** par rtk (tente un eslint et échoue). Pour lancer les vrais outils, préfixer `command` : `command pnpm lint`, ou appeler Biome direct `pnpm exec biome check .`. Cf. QUIRKS.
 
-## Commandes principales
+## Commandes principales (depuis la racine, Node 24 actif)
 
 ```bash
-pnpm install                  # racine, workspaces
-pnpm lint                     # Biome, tout le repo
-pnpm typecheck                # tsc --noEmit, tous les packages
-pnpm test                     # Vitest : unit (engine) + intégration (web, game-server)
-pnpm --filter engine test     # cibler un package
-pnpm dev                      # web + game-server en parallèle (hot reload)
-docker compose up --build     # stack prod-like
-pnpm e2e                      # Playwright — suppose la stack docker démarrée
+pnpm install                  # workspaces ; --frozen-lockfile en CI
+command pnpm exec biome check .   # lint + format check (bypass rtk)
+pnpm format                   # biome format --write (OK via rtk)
+command pnpm -r typecheck      # tsc --noEmit sur tous les packages
+command pnpm -r test           # Vitest : engine, shared, web, game-server (e2e exclu)
+pnpm --filter @pazaak/engine test   # cibler un package
+pnpm dev                      # web + game-server en parallèle (placeholders en P1)
+docker compose up --build     # stack prod-like (Dockerfiles finalisés en P5)
+pnpm e2e                      # Playwright (P7 ; suppose la stack docker démarrée)
 ```
 
-> Note : ces scripts supposent que la phase P0 (init monorepo) soit faite. À ce stade, ils ne sont pas encore définis dans un `package.json`.
+## Packages (workspaces)
+
+| Package | Nom | Rôle | Deps runtime épinglées |
+|---|---|---|---|
+| `packages/engine` | `@pazaak/engine` | Noyau règles/IA (P2) | `boardgame.io` 0.50.2 |
+| `packages/shared` | `@pazaak/shared` | Types inter-services | — (zéro dep) |
+| `apps/web` | `@pazaak/web` | Front TanStack Start + SQLite | `@tanstack/react-start` 1.168.25, `react` 19.2.7, `zustand` 5.0.14, `better-sqlite3` 12.10.0, `boardgame.io` 0.50.2 |
+| `apps/game-server` | `@pazaak/game-server` | Server Koa boardgame.io | `boardgame.io` 0.50.2, `koa` 3.2.1 |
+| `e2e` | `@pazaak/e2e` | Playwright (P7) | `@playwright/test` 1.60.0 (devDep) |
+
+Outillage : `typescript` 6.0.3, `@biomejs/biome` 2.4.16 (racine), `vitest` 4.1.8, `fast-check` 4.8.0 (engine).
 
 ## Services actifs
 
 | Service | Rôle | Accès |
 |---|---|---|
-| `apps/web` | Front TanStack Start + server functions + SQLite | port front publié (à définir, cf. `.env.example`) |
-| `apps/game-server` | Koa boardgame.io + Lobby API + webhook `onEnd` HMAC | port websocket publié (à définir) |
-| SQLite | Persistance web (`apps/web/data/pazaak.db`) | fichier local, migrations = script SQL idempotent au boot |
+| `apps/web` | Front TanStack Start + server functions + SQLite | `WEB_PORT` (défaut 3000) |
+| `apps/game-server` | Koa boardgame.io + Lobby API + webhook `onEnd` HMAC | `GAME_SERVER_PORT` (défaut 8000) |
+| SQLite | Persistance web (`DATABASE_PATH`, défaut `./data/pazaak.db`) | fichier local, créé/migré au boot (P4) |
 
 ## Variables d'environnement
 
-- `.env` / `.env.example` (commité) — defaults, ports
-- `.env.local` (hors git) — secrets et overrides
+- `.env.example` (commité) — documente les variables, sans valeurs sensibles.
+- `.env.local` (hors git) — secrets et overrides. `.env` est gitignoré.
 
 | Bloc | Variables |
 |---|---|
-| Secrets settlement | `SETTLEMENT_SECRET` (HMAC web ↔ game-server, jamais committé) |
-| Sessions | `SESSION_SECRET` (cookie httpOnly signé) |
-| Réseau | ports web + game-server, URL websocket game-server (consommée par le client web) |
+| Secrets | `SETTLEMENT_SECRET` (HMAC web ↔ game-server), `SESSION_SECRET` (cookie session) |
+| Réseau | `WEB_PORT`, `GAME_SERVER_PORT`, `GAME_SERVER_URL` |
+| Données | `DATABASE_PATH` |
