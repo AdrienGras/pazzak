@@ -33,8 +33,13 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 - L'IA est totalement découplée du runtime boardgame.io : pure `(PlayerState, AiParams)
   => AiMove`. Le web devra lire l'état de l'IA (son `PlayerState` complet, vu de son
   propre client) et dispatcher l'`AiMove` sur le client.
+- `AiMove` est **uniforme** (`args` toujours présent, `[]` pour stand/endTurn) → dispatch
+  générique sans cas particulier : `client.moves[m.move](...m.args)`.
 - Le moteur autorise désormais un joueur courant « actif > 20 » : tout pilote (UI, bot)
   doit lui proposer un coup (rescousse / endTurn), il n'y a plus d'auto-fin sur bust.
+- Test de flux réel ajouté (`play.test.ts`) qui épingle « actif >20 → endTurn → perte du
+  set ». Reste à faire en P3.2 : un test d'intégration **piloté par l'IA** (deux sièges
+  via `chooseMove` jusqu'au gameover) — l'IA n'est pour l'instant testée que pure.
 
 ---
 
