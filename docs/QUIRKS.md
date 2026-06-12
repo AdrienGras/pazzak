@@ -6,6 +6,26 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## boardgame.io : `playerView` s'applique aussi au client single-player (2026-06-11)
+
+**Découvert** : en P2, en branchant `playerView` (le test de `setup` a cassé).
+
+**Symptôme** : un `Client({ game })` single-player (sans `multiplayer: Local()`) renvoie un
+`G` **déjà strippé** pour le joueur courant `'0'` → l'adversaire `'1'` apparaît masqué
+(`hand: { count }`, `sideDeck: null`). Impossible d'inspecter l'état brut des deux joueurs
+via un client.
+
+**Cause** : dès que `playerView` est défini sur le Game, boardgame.io l'applique pour le
+`playerID` courant, y compris en mono-client.
+
+**Workaround** : pour tester l'état brut (ex. `setup`), appeler la **fonction pure**
+`initialState()` directement, sans passer par un Client. Pour les flux, lire chaque joueur
+depuis SON client (`players['0']` via `p0`, `players['1']` via `p1`) en multiplayer `Local()`.
+
+**Référence** : `packages/engine/test/setup.test.ts`, `packages/engine/test/support.ts`
+
+---
+
 ## `pnpm format` ne couvre pas le lint/organizeImports (2026-06-11)
 
 **Découvert** : pendant P2.

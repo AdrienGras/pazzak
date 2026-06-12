@@ -11,7 +11,7 @@ Carte des paths, conteneurs, services, accès. À jour au fil des découvertes.
 - **Path hôte** : `/srv/AdrienGras/pazzak`
 - **Branche par défaut** : `main`
 - **Convention de merge** : feature branches + conventional commits (`feat(engine): …`), **mergées dans `main` en fin de livraison (`--no-ff`, pas de PR)**. Ne jamais commiter directement sur `main`.
-- **État** : monorepo **bootstrappé (P1 fait)**. Structure pnpm workspaces en place, placeholders + tests verts. Prochaine phase ROADMAP : **P2 (engine)**.
+- **État** : **P1 + P2 livrés et mergés dans `main`.** Monorepo bootstrappé + **moteur Pazaak complet** (`@pazaak/engine`). `apps/*` et `shared` encore en placeholders. Prochaine phase ROADMAP : **P3 (solo client-local : IA + écrans web)**.
 
 ## Toolchain (IMPORTANT)
 
@@ -42,13 +42,28 @@ pnpm e2e                      # Playwright (P7 ; suppose la stack docker démarr
 
 | Package | Nom | Rôle | Deps runtime épinglées |
 |---|---|---|---|
-| `packages/engine` | `@pazaak/engine` | Noyau règles/IA (P2) | `boardgame.io` 0.50.2 |
+| `packages/engine` | `@pazaak/engine` | Noyau règles (P2 ✅, IA→P3) | `boardgame.io` 0.50.2 |
 | `packages/shared` | `@pazaak/shared` | Types inter-services | — (zéro dep) |
 | `apps/web` | `@pazaak/web` | Front TanStack Start + SQLite | `@tanstack/react-start` 1.168.25, `react` 19.2.7, `zustand` 5.0.14, `better-sqlite3` 12.10.0, `boardgame.io` 0.50.2 |
 | `apps/game-server` | `@pazaak/game-server` | Server Koa boardgame.io | `boardgame.io` 0.50.2, `koa` 3.2.1 |
 | `e2e` | `@pazaak/e2e` | Playwright (P7) | `@playwright/test` 1.60.0 (devDep) |
 
 Outillage : `typescript` 6.0.3, `@biomejs/biome` 2.4.16 (racine), `vitest` 4.1.8, `fast-check` 4.8.0 (engine).
+
+### `packages/engine/src` — modules (P2)
+
+| Fichier | Rôle |
+|---|---|
+| `types.ts` | Schéma `G`, `SideCard`, `PlayedCard`, `PlayerState` + vues strippées (contrat §3-4) |
+| `deck.ts` | `createMainDeck` (40), `standardSideCardCatalogue` (18) |
+| `scoring.ts` | `scoreBoard`, `isBust/isTwenty/hasNineCards`, `betterScore`, `setOutcome` (fin de set) |
+| `turn.ts` | `drawFromMainDeck`, `refreshScoreAndFlags` (bust/20/9) |
+| `moves.ts` | `pickSideDeck`, `playCard`, `endTurn`, `stand` (+ validations) |
+| `playerView.ts` | Strip secret state (contrat §4) |
+| `game.ts` | `PazaakGame` (Game boardgame.io), `initialState`, phases `pickSideDeck`/`play`, boucle de match |
+| `index.ts` | API publique |
+
+Tests : `packages/engine/test/` (9 fichiers, 50 tests) + `test/support.ts` (harnais Client headless). Invariants fast-check : `invariants.test.ts` (1000 runs). **L'IA (`ai.ts`) arrive en P3.**
 
 ## Services actifs
 

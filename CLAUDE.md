@@ -65,6 +65,22 @@ docker compose up --build     # stack prod-like
 pnpm e2e                      # Playwright — suppose la stack docker démarrée
 ```
 
+### Toolchain locale — gotchas (TOUJOURS appliquer)
+
+Appris en P1/P2, détails dans `docs/ENVIRONMENT.md` + `docs/QUIRKS.md` :
+
+- **Node 24 via nvm avant toute commande** (le host démarre par défaut sur Node 23, et
+  `pnpm` n'est shimé qu'après `corepack enable`) :
+  ```bash
+  export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"; nvm use && corepack enable
+  ```
+- **`pnpm lint` est intercepté par rtk** (il tente eslint et échoue) → préfixer `command`
+  (`command pnpm ...`) ou appeler l'outil direct.
+- **`pnpm format` ≠ lint** : il ne fait que la mise en forme. Finir par
+  `command pnpm exec biome check .` (lint + tri d'imports) avant de déclarer « terminé ».
+- **Réglages pnpm dans `pnpm-workspace.yaml`** (pas `.npmrc`) : `saveExact`, `allowBuilds`
+  (build natif), `overrides`. pnpm 11 ne lit plus `.npmrc`/`package.json#pnpm` pour ça.
+
 ## Carte des chantiers (contrat §11)
 
 | Package            | Rôle                                                           | Ne touche jamais                                    |
