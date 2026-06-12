@@ -6,6 +6,38 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 
 ---
 
+## 2026-06-12 — P3.1 Moteur bust-recovery + IA livré ★
+
+### Dernière chose faite
+- Corrigé le moteur : le bust n'est plus verrouillé à la pioche forcée. Un joueur > 20
+  (board < 9) reste actif et peut jouer une carte de side deck pour revenir ≤ 20 ; le
+  bust est finalisé par `endTurn`/`stand` (RULES §5 mis à jour d'abord).
+  `refreshScoreAndFlags`, `endTurn`, `stand` modifiés ; tests `turn.test.ts`,
+  `end-turn-stand.test.ts` ajoutés ; `play-card.test.ts` mis à jour.
+- Livré l'IA heuristique pure (`ai.ts`) : `chooseMove(self, params)` (contrat §6) +
+  `chooseSideDeck()`. Exportées par `index.ts`. `ai.test.ts` couvre stand / jeu vers 20 /
+  rescousse / bust forcé / déterminisme du signe ±.
+
+### Trucs en suspens
+- **Bloc P3.2 (web)** non commencé : wiring TanStack Start + écrans pick/board/fin,
+  client local boardgame.io branché sur l'IA. C'est lui qui satisfait le critère de
+  sortie P3 « partie solo complète au navigateur ». Spec à écrire (brainstorming).
+- Gold cards toujours P8 ; l'IA ne joue que des cartes standard.
+
+### Prochaine chose à creuser
+- P3.2 : résoudre `@tanstack/react-start` + client `boardgame.io` via Context7 avant le
+  front. Décider comment l'IA pilote ses tours dans un client `Local()` (driver manuel
+  qui dispatch `chooseMove`, vs bot natif boardgame.io).
+
+### Notes pour future Claude
+- L'IA est totalement découplée du runtime boardgame.io : pure `(PlayerState, AiParams)
+  => AiMove`. Le web devra lire l'état de l'IA (son `PlayerState` complet, vu de son
+  propre client) et dispatcher l'`AiMove` sur le client.
+- Le moteur autorise désormais un joueur courant « actif > 20 » : tout pilote (UI, bot)
+  doit lui proposer un coup (rescousse / endTurn), il n'y a plus d'auto-fin sur bust.
+
+---
+
 ## 2026-06-11 — P2 Engine livré ★
 
 ### Dernière chose faite

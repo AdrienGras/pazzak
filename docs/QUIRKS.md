@@ -6,6 +6,24 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## Bust finalisé à la conclusion du tour, pas à la pioche (2026-06-12)
+
+**Découvert / décidé** : en P3, en branchant l'IA (le branch « éviter le bust » du
+contrat §6 était mort avec le moteur P2).
+
+**Comportement** : un joueur dont la pioche forcée fait dépasser 20 **n'est pas busté
+immédiatement** (tant que board < 9). Il reste `currentPlayer` actif et DOIT jouer un
+coup (carte de rescousse pour revenir ≤ 20, ou `endTurn`/`stand` qui finalise le bust).
+`refreshScoreAndFlags` ne verrouille `busted` que sur 9 cartes en dépassant 20.
+
+**Implication** : tout pilote du jeu (UI solo, futur bot, tests) doit fournir un coup au
+joueur courant même au-dessus de 20 — il n'y a plus d'auto-fin de tour sur bust. Le bust
+sur la pioche n'apparaît qu'après `endTurn`/`stand`.
+
+**Référence** : `packages/engine/src/turn.ts`, `moves.ts` ; RULES §5 ; contrat §5-6.
+
+---
+
 ## boardgame.io : `playerView` s'applique aussi au client single-player (2026-06-11)
 
 **Découvert** : en P2, en branchant `playerView` (le test de `setup` a cassé).

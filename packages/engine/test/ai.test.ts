@@ -4,7 +4,7 @@ import { chooseMove, chooseSideDeck } from "../src/ai";
 import { pickSideDeck } from "../src/moves";
 import type { G, PlayedCard, PlayerState, SideCard } from "../src/types";
 
-const main = (value: number): PlayedCard => ({
+const _main = (value: number): PlayedCard => ({
 	source: "main",
 	value,
 	flipped: false,
