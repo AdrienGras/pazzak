@@ -131,8 +131,8 @@ Fonctions **pures**, exportées par `engine`.
 
 ```typescript
 type AiMove =
-  | { move: 'stand' }
-  | { move: 'endTurn' }
+  | { move: 'stand'; args: [] }
+  | { move: 'endTurn'; args: [] }
   | { move: 'playCard'; args: [handIndex: number, declaration?: { sign: Sign }] };
 
 type AiParams = { standThreshold: 17 | 18 | 19 }; // défaut 18 ; niveaux de difficulté

@@ -4,8 +4,8 @@
 import type { PlayerState, SideCard, Sign, StandardValue } from "./types";
 
 export type AiMove =
-	| { move: "stand" }
-	| { move: "endTurn" }
+	| { move: "stand"; args: [] }
+	| { move: "endTurn"; args: [] }
 	| {
 			move: "playCard";
 			args: [handIndex: number, declaration?: { sign: Sign }];
@@ -78,12 +78,12 @@ export function chooseMove(self: PlayerState, params: AiParams): AiMove {
 	};
 
 	if (score > 20) {
-		return bestPlay((r) => r <= 20) ?? { move: "endTurn" };
+		return bestPlay((r) => r <= 20) ?? { move: "endTurn", args: [] };
 	}
 	if (score >= params.standThreshold) {
-		return { move: "stand" };
+		return { move: "stand", args: [] };
 	}
-	return bestPlay((r) => r === 20) ?? { move: "endTurn" };
+	return bestPlay((r) => r === 20) ?? { move: "endTurn", args: [] };
 }
 
 /** Side deck par défaut de l'IA : équilibré, riche en ± (rescousse + atteindre 20). */

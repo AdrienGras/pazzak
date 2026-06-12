@@ -41,19 +41,21 @@ describe("chooseMove — stand (contrat §6)", () => {
 	test("stand quand le score est dans [seuil, 20]", () => {
 		expect(chooseMove(ps({ score: 18, hand: [plus(1)] }), P18)).toEqual({
 			move: "stand",
+			args: [],
 		});
 		expect(chooseMove(ps({ score: 19, hand: [] }), P18)).toEqual({
 			move: "stand",
+			args: [],
 		});
 	});
 
 	test("le seuil est paramétrable (difficulté)", () => {
 		expect(
 			chooseMove(ps({ score: 17, hand: [] }), { standThreshold: 17 }),
-		).toEqual({ move: "stand" });
+		).toEqual({ move: "stand", args: [] });
 		expect(
 			chooseMove(ps({ score: 17, hand: [] }), { standThreshold: 19 }),
-		).toEqual({ move: "endTurn" });
+		).toEqual({ move: "endTurn", args: [] });
 	});
 });
 
@@ -67,6 +69,7 @@ describe("chooseMove — sous le seuil (contrat §6)", () => {
 	test("endTurn si aucune carte n'atteint 20", () => {
 		expect(chooseMove(ps({ score: 12, hand: [plus(3)] }), P18)).toEqual({
 			move: "endTurn",
+			args: [],
 		});
 	});
 
@@ -102,6 +105,7 @@ describe("chooseMove — rescousse au-dessus de 20 (contrat §6)", () => {
 	test("endTurn (bust forcé) si aucune carte ne ramène ≤ 20", () => {
 		expect(chooseMove(ps({ score: 25, hand: [pm(2)] }), P18)).toEqual({
 			move: "endTurn",
+			args: [],
 		});
 	});
 });
