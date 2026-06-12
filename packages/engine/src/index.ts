@@ -1,6 +1,8 @@
 // API publique du moteur Pazaak (contrat §11, BOOTSTRAP §3).
 // L'IA (ai.ts) sera ajoutée en P3.
 
+export type { AiMove, AiParams } from "./ai";
+export { chooseMove, chooseSideDeck } from "./ai";
 export { createMainDeck, standardSideCardCatalogue } from "./deck";
 export { initialState, PazaakGame } from "./game";
 export { playerView } from "./playerView";

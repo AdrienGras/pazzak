@@ -112,24 +112,44 @@ présente dans l'objet sérialisé (assertion structurelle, puis e2e scénario 4
 **Phase `play`** — boucle de sets.
 - `onBegin` de tour : si le joueur courant est `standing` ou `busted`, son tour est
   sauté (ordre de tour custom). Sinon : pioche automatique du main deck → `board`,
-  recalcul du score, détection bust / 20 exact / 9 cartes.
+  recalcul du score. Auto-stand à 20 exact et à 9 cartes ; le **bust n'est pas verrouillé
+  ici** (un score > 20 avec board < 9 laisse le joueur actif pour une rescousse).
 - `playCard(handIndex: number, declaration?: { sign: Sign; value?: 1|2 })` :
   rejets — index invalide, `playedHandCardThisTurn`, joueur standing/busted,
   déclaration manquante pour ± et 1±2, déclaration fournie pour une carte à signe fixe.
 - `endTurn()` : clôt le tour.
-- `stand()` : fige le joueur, clôt le tour.
+- `stand()` : fige le joueur (ou le buste si score > 20), clôt le tour.
+- Conclusion du tour (`endTurn`/`stand`) : si le score > 20, le joueur est `busted`
+  (le bust n'est finalisé qu'ici, contrat RULES §5).
 - Fin de set (`endIf` de la boucle interne) : cf. RULES §5. Tie sans Tiebreaker →
   set rejoué : plateaux vidés, deck remélangé, `currentSet++`, aucun `setsWon` modifié.
 - Fin de match : `setsWon === 3` → `matchWinner`, `ctx.events.endGame({ winner })`.
 
 ## 6. IA heuristique (solo, dans `engine`)
 
-Fonction pure `(view: PlayerViewState, params: AiParams) => Move`.
-- Stand si score ∈ [standThreshold, 20] (défaut 18).
-- Jouer une carte de main si elle amène à 20 exact, ou si elle évite un bust en
-  ramenant ≤ 20 ; choisir la carte qui maximise le score résultant ≤ 20.
-- Sinon end turn.
-- `AiParams = { standThreshold: 17|18|19 }` = niveaux de difficulté.
+Fonctions **pures**, exportées par `engine`.
+
+```typescript
+type AiMove =
+  | { move: 'stand'; args: [] }
+  | { move: 'endTurn'; args: [] }
+  | { move: 'playCard'; args: [handIndex: number, declaration?: { sign: Sign }] };
+
+type AiParams = { standThreshold: 17 | 18 | 19 }; // défaut 18 ; niveaux de difficulté
+
+chooseMove(self: PlayerState, params: AiParams): AiMove   // self = état complet de l'IA
+chooseSideDeck(): SideCard[]                              // 10 cartes standard, déterministe
+```
+
+`chooseMove` (appelée seulement quand l'IA est active ; la pioche auto a déjà eu lieu) :
+- `score > 20` → **rescousse** : jouer la carte de main qui maximise le score résultant
+  ≤ 20 (pour une ± : tester `+v` et `−v`) ; si aucune ne ramène ≤ 20 → `endTurn` (bust).
+- `score ∈ [standThreshold, 20]` → `stand`.
+- `score < standThreshold` → jouer une carte si elle amène à **20 exact**, sinon `endTurn`.
+
+Le signe d'une ± est celui qui maximise le résultat ≤ 20 ; déterminisme : plus petit
+`handIndex` à résultat égal. `chooseSideDeck` renvoie un deck équilibré par défaut
+(`±1..±6, +1, +2, −1, −2`).
 
 ## 7. Server functions (TanStack Start)
 
