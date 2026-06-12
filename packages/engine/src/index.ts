@@ -2,6 +2,8 @@
 // L'IA (ai.ts) sera ajoutée en P3.
 
 export { createMainDeck, standardSideCardCatalogue } from "./deck";
+export { chooseMove, chooseSideDeck } from "./ai";
+export type { AiMove, AiParams } from "./ai";
 export { initialState, PazaakGame } from "./game";
 export { playerView } from "./playerView";
 export {
