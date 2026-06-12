@@ -23,7 +23,7 @@ export function isTwenty(score: number): boolean {
 	return score === 20;
 }
 
-/** 9 cartes posées sans bust : stand automatique + victoire du set (RULES §5). */
+/** 9 cartes posées : stand forcé. Sans bust → victoire du set ; avec bust → perte (RULES §5). */
 export function hasNineCards(board: readonly PlayedCard[]): boolean {
 	return board.length >= 9;
 }

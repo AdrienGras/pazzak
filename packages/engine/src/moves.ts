@@ -47,6 +47,9 @@ export const endTurn: Move<G> = ({ G, ctx, events, playerID }) => {
 	if (!player || player.standing || player.busted) {
 		return INVALID_MOVE;
 	}
+	if (player.score > 20) {
+		player.busted = true; // bust finalisé à la conclusion du tour (RULES §5)
+	}
 	events.endTurn();
 };
 
@@ -59,7 +62,11 @@ export const stand: Move<G> = ({ G, ctx, playerID }) => {
 	if (!player || player.standing || player.busted) {
 		return INVALID_MOVE;
 	}
-	player.standing = true;
+	if (player.score > 20) {
+		player.busted = true; // stand au-dessus de 20 = bust (RULES §5)
+	} else {
+		player.standing = true;
+	}
 };
 
 /**

@@ -60,6 +60,25 @@ describe("refreshScoreAndFlags (RULES §5, bust à la conclusion)", () => {
 		expect(p.busted).toBe(true);
 	});
 
+	test("9 cartes à 20 exact : stand auto, pas de bust (hasNineCards prime sur isTwenty)", () => {
+		const p = ps({
+			board: [
+				main(2),
+				main(2),
+				main(2),
+				main(2),
+				main(2),
+				main(2),
+				main(2),
+				main(2),
+				main(4),
+			],
+		}); // 20, 9 cartes
+		refreshScoreAndFlags(p);
+		expect(p.standing).toBe(true);
+		expect(p.busted).toBe(false);
+	});
+
 	test("score < 20 (board < 9) : rien n'est verrouillé", () => {
 		const p = ps({ board: [main(7)] });
 		refreshScoreAndFlags(p);
