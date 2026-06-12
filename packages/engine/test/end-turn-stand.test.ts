@@ -60,7 +60,13 @@ function callStand(G: G): unknown {
 describe("endTurn (conclusion, RULES §5)", () => {
 	test("score ≤ 20 : clôt le tour sans buster", () => {
 		const g = makeG({ board: [main(10)], score: 10 });
-		callEndTurn(g);
+		expect(callEndTurn(g)).toBe(true); // endTurn() a bien été appelé
+		expect((g.players["0"] as PlayerState).busted).toBe(false);
+	});
+
+	test("score = 20 exact : clôt le tour sans buster (borne)", () => {
+		const g = makeG({ board: [main(10), main(10)], score: 20 });
+		expect(callEndTurn(g)).toBe(true);
 		expect((g.players["0"] as PlayerState).busted).toBe(false);
 	});
 
@@ -73,11 +79,23 @@ describe("endTurn (conclusion, RULES §5)", () => {
 	test("rejet si déjà standing", () => {
 		expect(callEndTurn(makeG({ standing: true }))).toBe(INVALID_MOVE);
 	});
+
+	test("rejet si déjà busted", () => {
+		expect(callEndTurn(makeG({ busted: true }))).toBe(INVALID_MOVE);
+	});
 });
 
 describe("stand (conclusion, RULES §5)", () => {
 	test("score ≤ 20 : fige le joueur", () => {
 		const g = makeG({ board: [main(18)], score: 18 });
+		callStand(g);
+		const p = g.players["0"] as PlayerState;
+		expect(p.standing).toBe(true);
+		expect(p.busted).toBe(false);
+	});
+
+	test("score = 20 exact : fige le joueur, pas de bust (borne)", () => {
+		const g = makeG({ board: [main(10), main(10)], score: 20 });
 		callStand(g);
 		const p = g.players["0"] as PlayerState;
 		expect(p.standing).toBe(true);
