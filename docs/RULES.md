@@ -56,6 +56,9 @@ plus haute commence). Pour les sets suivants : alternance.
    son plateau. (Pas de pioche si le joueur a déclaré *Stand* — il ne joue plus.)
 2. **Carte de main (optionnel)** : il peut jouer **au maximum une** carte de sa main,
    posée sur son plateau. Signe/valeur déclarés à ce moment pour les ± et la 1±2.
+   Si la pioche forcée a fait **dépasser 20**, c'est ici qu'il peut jouer une carte
+   négative pour revenir ≤ 20 (rescousse) ; le bust n'est constaté qu'au choix de fin
+   de tour (cf. §5).
 3. **Choix de fin de tour** :
    - **End Turn** — il repiochera au début de son prochain tour ;
    - **Stand** — son score est figé jusqu'à la fin du set, il ne joue plus.
@@ -67,11 +70,16 @@ Les tours ne sont donc **pas strictement alternés** en fin de set.
 
 | Condition | Résultat |
 |---|---|
-| Score > 20 (**bust**) | Le joueur perd le set immédiatement |
+| Score > 20 à la **fin du tour** (**bust**) | Le joueur perd le set |
 | Score = **20 exact** | Stand automatique |
 | **9 cartes** en jeu sans bust | Stand automatique **et victoire du set** |
 | Les deux joueurs ont stand | Le score le plus élevé ≤ 20 gagne |
 | Égalité au double stand | Set **rejoué**, non compté (sauf Tiebreaker joué → son joueur gagne) |
+
+Le **bust est constaté à la conclusion du tour** (End Turn ou Stand), pas à l'instant de
+la pioche : un joueur qui dépasse 20 sur la pioche forcée peut jouer une carte de side
+deck pour revenir ≤ 20. La règle des **9 cartes** ne donne la victoire que **sans bust** :
+9 cartes en dépassant 20 (on ne peut plus poser de carte) = bust.
 
 Le main deck est remélangé entre les sets. Les plateaux sont vidés. Les mains sont
 conservées en l'état (cartes consommées non rendues).
