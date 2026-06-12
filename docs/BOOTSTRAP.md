@@ -148,7 +148,9 @@ Zéro logique, zéro dépendance.
 
 ## 9. Conventions
 
-- Commits : conventional commits (`feat(engine): ...`, `fix(web): ...`).
+- Commits : **gitmoji + conventional commits**, format `<emoji> type(scope): sujet`
+  (emoji unicode, pas le shortcode). Ex. : `✨ feat(engine): ...`, `🐛 fix(web): ...`,
+  `📝 docs(p3): ...`, `♻️ refactor(...)`, `✅ test(...)`, `🔧 chore: ...`.
 - Nommage : kebab-case fichiers, PascalCase types/composants, camelCase fonctions.
 - Pas de `any` ; les unions discriminées (`SideCard`, `PlayedCard`) sont fermées —
   tout `switch` est exhaustif (`satisfies never` sur le default).

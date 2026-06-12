@@ -51,6 +51,11 @@ Monorepo TypeScript : jeu de Pazaak (KOTOR) avec mode solo contre IA et mode ran
   temporaire. Pas de `waitForTimeout` en e2e.
 - Versions épinglées : ne mets **jamais** à jour une dépendance structurante sans
   demande explicite.
+- **Commits en gitmoji + conventional commits** : préfixer chaque commit d'un emoji
+  gitmoji (caractère unicode, pas le shortcode `:sparkles:`), suivi du type conventionnel
+  et du scope. Format : `<emoji> type(scope): sujet`.
+  Ex. : `✨ feat(engine): IA heuristique`, `🐛 fix(web): …`, `📝 docs(p3): …`,
+  `♻️ refactor(engine): …`, `✅ test(engine): …`, `🔧 chore: …`.
 
 ## Commandes
 
