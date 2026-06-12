@@ -101,13 +101,16 @@ describe("playCard (contrat §5)", () => {
 		expect(p.standing).toBe(true);
 	});
 
-	test("une carte qui dépasse 20 buste", () => {
+	test("une carte qui dépasse 20 ne buste pas tout de suite (bust à la conclusion)", () => {
 		const g = makeG({
 			hand: [plus3],
 			board: [mainCard(10), mainCard(9)],
 			score: 19,
 		});
 		call(g, 0);
-		expect((g.players["0"] as PlayerState).busted).toBe(true);
+		const p = g.players["0"] as PlayerState;
+		expect(p.score).toBe(22);
+		expect(p.busted).toBe(false); // reste actif ; le bust est finalisé par endTurn/stand
+		expect(p.standing).toBe(false);
 	});
 });
