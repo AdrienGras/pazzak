@@ -2,13 +2,8 @@ import { describe, expect, test } from "vitest";
 import type { AiParams } from "../src/ai";
 import { chooseMove, chooseSideDeck } from "../src/ai";
 import { pickSideDeck } from "../src/moves";
-import type { G, PlayedCard, PlayerState, SideCard } from "../src/types";
+import type { G, PlayerState, SideCard } from "../src/types";
 
-const _main = (value: number): PlayedCard => ({
-	source: "main",
-	value,
-	flipped: false,
-});
 const plus = (value: 1 | 2 | 3 | 4 | 5 | 6): SideCard => ({
 	kind: "standard",
 	value,
