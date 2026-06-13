@@ -8,6 +8,13 @@ export default defineConfig({
 			reporter: ["text", "lcov"],
 			reportsDirectory: "./coverage",
 			include: ["src/**"],
+			// Garde dure dans le job CI quality (le step test:coverage échoue sous le seuil).
+			// Branches volontairement non gardées (gardes défensives ~89% ; cf. décision CI).
+			thresholds: {
+				lines: 90,
+				statements: 90,
+				functions: 90,
+			},
 		},
 	},
 });
