@@ -169,7 +169,7 @@ export const PazaakGame: Game<G> = {
 					next: ({ G, ctx }) => nextActivePos(G, ctx),
 				},
 				// Pioche automatique en début de tour (sauf joueur figé). RULES §4.
-				onBegin: ({ G, ctx }) => {
+				onBegin: ({ G, ctx, events }) => {
 					const id = ctx.currentPlayer;
 					if (!isActive(G, id)) {
 						return;
@@ -179,6 +179,15 @@ export const PazaakGame: Game<G> = {
 						p.playedHandCardThisTurn = false;
 					}
 					drawFromMainDeck(G, id);
+					// La pioche forcée peut figer le joueur (20 pile / 9 cartes).
+					// boardgame.io ne réévalue PAS turn.endIf après onBegin : on
+					// termine donc le tour explicitement pour que turn.onEnd
+					// (resolveSetIfOver) tourne et que turn.order.next avance —
+					// sinon la boucle de set se fige (joueur courant figé, sans
+					// move légal). endTurn est supporté depuis turn.onBegin.
+					if (!isActive(G, id)) {
+						events.endTurn();
+					}
 				},
 				// Clôt le tour dès que le joueur courant est figé (bust, 20, 9 cartes, stand).
 				endIf: ({ G, ctx }) => {
