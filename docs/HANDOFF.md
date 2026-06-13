@@ -6,15 +6,16 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 
 ---
 
-## 2026-06-13 — CI-3 Workflow GitHub Actions livré ★
+## 2026-06-13 — Outillage CI livré ★
 
 ### Dernière chose faite
-- Créé `.github/workflows/ci.yml` avec deux jobs :
-  - `quality` : checkout → pnpm setup → install frozen → `pnpm check` → `pnpm typecheck` → `pnpm test:coverage` → upload Codecov (`fail_ci_if_error: false`).
-  - `security` : checkout → pnpm setup → install frozen → `pnpm audit --audit-level=high`.
-- Validé avec `act pull_request` (image `catthehacker/ubuntu:act-latest`) :
-  - `quality` → **Job succeeded** (Codecov loggue "Token required" mais ne bloque pas).
-  - `security` → **Job failed** : 3 vulns **high** dans les deps transitives de `boardgame.io` (`ws` CVE GHSA-3h5v-q93c-6h6q + `socket.io-parser` CVE GHSA-677m-j7p3-52f9). Non patchées volontairement.
+- CI GitHub Actions (`ci.yml`) : jobs `quality` (check + typecheck + test:coverage +
+  Codecov, permissions least-privilege) et `security` (`pnpm audit --audit-level=high`).
+  Validé end-to-end via `act` (quality vert ; security rouge sur 3 vulns boardgame.io).
+- Couverture vitest v8 (engine, lcov) → Codecov tokenless. Hooks lefthook (commit-msg →
+  commitlint gitmoji ; pre-commit → biome). Dependabot (actions). README + 7 badges.
+- Règle post-push ajoutée à `CLAUDE.md` (observer la CI ; sur remontée sécu : rechercher
+  puis proposer un patch, jamais auto).
 
 ### Trucs en suspens
 - **Vulns high dans boardgame.io** (transitif) : `ws <7.5.10` (DoS HTTP headers) et `socket.io-parser` (ReDoS). Le job `security` bloquera en CI sur main jusqu'à ce que boardgame.io publie une version corrigée ou qu'un override soit ajouté dans `pnpm-workspace.yaml`.
