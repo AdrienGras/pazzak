@@ -6,31 +6,45 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 
 ---
 
-## 2026-06-13 — Outillage CI livré ★
+## 2026-06-13 — Outillage CI livré + opérationnel ★
 
 ### Dernière chose faite
-- CI GitHub Actions (`ci.yml`) : jobs `quality` (check + typecheck + test:coverage +
-  Codecov, permissions least-privilege) et `security` (`pnpm audit --audit-level=high`).
-  Validé end-to-end via `act` (quality vert ; security rouge sur 3 vulns boardgame.io).
-- Couverture vitest v8 (engine, lcov) → Codecov tokenless. Hooks lefthook (commit-msg →
-  commitlint gitmoji ; pre-commit → biome). Dependabot (actions). README + 7 badges.
-- Règle post-push ajoutée à `CLAUDE.md` (observer la CI ; sur remontée sécu : rechercher
-  puis proposer un patch, jamais auto).
+- CI GitHub Actions (`ci.yml`) **mergée dans `main`, poussée, verte**. Jobs `quality`
+  (`check` → `typecheck` → `test:coverage` → Codecov ; permissions least-privilege) et
+  `security` (`pnpm audit --audit-level=high`). Workflow validé en local via `act`.
+- Couverture vitest v8 (engine, lcov). Hooks lefthook (commit-msg → commitlint gitmoji ;
+  pre-commit → biome). README + 7 badges. Règle post-push dans `CLAUDE.md`.
+- **Vulns high boardgame.io patchées** via `pnpm overrides` (`ws ≥7.5.10`,
+  `socket.io-parser ≥4.2.6`, `@koa/cors ≥5.0` — majeure 4→5, à valider en P5/P6) → job
+  `security` vert.
+- **Dependabot (actions) traité** : PR de bump mergées → `checkout@v6`, `setup-node@v6`,
+  `pnpm/action-setup@v6`, `codecov-action@v7` (résout la dépréciation Node 20 du 16/06).
+- **Codecov opérationnel** : le tokenless est refusé → secret `CODECOV_TOKEN` ajouté +
+  `token:` sur le step → upload OK, badge peuplé (~84%).
+- **Seuil de couverture 90%** (lignes/stmts/funcs) dans `vitest.config.ts` → le job
+  `quality` échoue sous 90% (branches non gardées, ~89%). Prouvé non-no-op.
 
 ### Trucs en suspens
-- **Vulns high dans boardgame.io** (transitif) : `ws <7.5.10` (DoS HTTP headers) et `socket.io-parser` (ReDoS). Le job `security` bloquera en CI sur main jusqu'à ce que boardgame.io publie une version corrigée ou qu'un override soit ajouté dans `pnpm-workspace.yaml`.
-- **Bloc P3.2 (web)** toujours non commencé.
-- **CI-4 → CI-7** toujours en attente.
+- **Bloc P3.2 (web)** non commencé — prochain chantier (critère de sortie P3).
+- Override `@koa/cors` 5.x (majeure) à **valider quand le game-server tournera (P5/P6)**.
+- e2e en CI → P7 (workflow séparé contre `docker compose`). Activer aussi les Dependabot
+  security alerts npm côté Settings GitHub.
 
 ### Prochaine chose à creuser
-- CI-4 : Dependabot pour github-actions (`.github/dependabot.yml`).
-- CI-5 : README + 7 badges.
-- Décision sur la stratégie vulns : override `ws` dans workspace ou attendre boardgame.io upstream ?
+- **P3.2 (web)** : brainstorming → wiring TanStack Start + écrans pick/board/fin + IA sur
+  client `Local()`. La CI (dont la garde 90%) tourne déjà dessus.
 
 ### Notes pour future Claude
-- L'image `act` `catthehacker/ubuntu:act-latest` est déjà pull locale (≈ pas besoin de re-télécharger).
-- `act` ne passe pas de token Codecov → l'upload échoue silencieusement ("Token required") mais le job passe grâce à `fail_ci_if_error: false`. En vraie CI GitHub, ça fonctionnera avec OIDC ou un secret `CODECOV_TOKEN`.
-- `pnpm audit` exit code 1 si au moins une vuln ≥ niveau demandé. Les 3 high sont dans le sous-arbre `boardgame.io > koa-socket-2 > socket.io > engine.io > ws`.
+- **Merger une PR qui touche `.github/workflows/` via `gh`** exige le scope `workflow`
+  (`gh auth refresh -h github.com -s workflow`) — déjà accordé. Le push git SSH n'est PAS
+  concerné (éditer `ci.yml` localement + push ferme la PR Dependabot). Cf. QUIRKS.
+- **Badge Codecov "unknown"** = aucune donnée ingérée (souvent token manquant) ; vérifier
+  le log du step (`Token length: 0` / "Token required"). Cf. QUIRKS.
+- `act pull_request -j <job> -P ubuntu-latest=catthehacker/ubuntu:act-latest` pour rejouer
+  un job en local (image déjà pull). `act` n'a pas le token Codecov (upload échoue, mais
+  `fail_ci_if_error: false`).
+- `pnpm audit` exit 1 si ≥1 vuln au niveau demandé ; les vulns boardgame.io vivent dans
+  `boardgame.io > koa-socket-2 > socket.io > {engine.io > ws | socket.io-parser}` + `@koa/cors`.
 
 ---
 

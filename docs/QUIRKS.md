@@ -6,6 +6,26 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## Merger une PR touchant `.github/workflows/` via `gh` exige le scope `workflow` (2026-06-13)
+
+**Découvert** : en mergeant les PR Dependabot de bump d'actions.
+
+**Symptôme** : `gh pr merge` échoue avec `refusing to allow an OAuth App to create or
+update workflow .github/workflows/ci.yml without workflow scope`.
+
+**Cause** : le token OAuth de `gh` n'a pas le scope `workflow`, requis pour toute
+opération API qui crée/modifie un fichier de workflow.
+
+**Fix** : `gh auth refresh -h github.com -s workflow` (interactif). Le push **git via
+SSH n'est PAS concerné** — on peut éditer `ci.yml` localement et pousser. Astuce : éditer
+le fichier en local + push **ferme la PR Dependabot correspondante** automatiquement.
+Note : plusieurs PR Dependabot touchant le même `ci.yml` mergées en série créent des
+conflits (le 2ᵉ merge ne s'applique plus proprement) → résoudre en local.
+
+**Référence** : PR Dependabot #2-5 (bumps d'actions, juin 2026).
+
+---
+
 ## Codecov refuse le tokenless → `CODECOV_TOKEN` requis (2026-06-13)
 
 **Découvert** : au premier run CI réel (le spec supposait « Codecov tokenless » sur repo public).

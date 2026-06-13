@@ -111,6 +111,12 @@ Un chantier n'est terminé que si : `pnpm lint`, `pnpm typecheck` et `pnpm test`
 verts à la racine ; les critères de sortie de la phase ROADMAP sont satisfaits ; et
 aucun document de `docs/` n'est en désaccord avec le code livré.
 
+Depuis 2026-06-13, la **CI GitHub Actions doit aussi être verte** : job `quality`
+(`pnpm check` + `typecheck` + `test:coverage` avec **seuil de couverture engine 90%**
+lignes/stmts/funcs) et job `security` (`pnpm audit --audit-level=high`). Observer le run
+après chaque push (cf. règle post-push) ; la livraison passe par une branche mergée
+`--no-ff` dans `main` puis poussée.
+
 ## Mémoire projet — où chercher quoi
 
 Le projet maintient une base de connaissances opérationnelle sous `docs/`. **En début de session, scanner ces fichiers pour se resituer** :

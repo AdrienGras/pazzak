@@ -80,6 +80,9 @@ Tests : `packages/engine/test/` (9 fichiers, 50 tests) + `test/support.ts` (harn
   (`pnpm audit --audit-level=high`). Déclencheurs : push `main` + PR. `permissions:
   contents: read` (top) + `id-token: write` sur `quality` (Codecov OIDC). Actions épinglées
   par tag majeur ; Dependabot (`.github/dependabot.yml`) suit les bumps d'actions.
+  Versions actuelles (post-Dependabot 2026-06-13, Node 24) : `checkout@v6`, `setup-node@v6`,
+  `pnpm/action-setup@v6`, `codecov-action@v7`. Merger une PR de workflow via `gh` exige le
+  scope `workflow` sur le token (cf. QUIRKS).
 - **Couverture** : `pnpm test:coverage` (engine, lcov dans `packages/engine/coverage/`),
   upload Codecov via le secret repo `CODECOV_TOKEN` (le tokenless est refusé par Codecov,
   cf. QUIRKS). Badge dans le README. **Seuil dur** (`vitest.config.ts`, `coverage.thresholds`) :
