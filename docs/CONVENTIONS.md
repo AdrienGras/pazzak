@@ -126,3 +126,37 @@ Deux niveaux de test, complémentaires (établis en P2) :
   depuis `p0`, `players['1']` depuis `p1`. Pour l'état brut (setup), tester `initialState()`.
 - Pour vérifier l'absence de fuite secret state : sentinelles (cartes gold dans l'état
   adverse) + `JSON.stringify(view)` ne doit pas les contenir.
+
+---
+
+## Web (`apps/web`) — logique testable extraite + hook/composant fin (P3.2)
+
+Pattern établi pour brancher le moteur sur le front sans tests de composants (l'UI est
+couverte par les e2e P7) : **extraire toute la logique décisionnelle en fonction pure
+testable**, puis poser un hook/composant fin par-dessus.
+
+```ts
+// 1. Fonction pure (testée en unit, framework-agnostic) :
+export function aiStep(state, moves, params): boolean { /* lit l'état, dispatche ≤1 coup */ }
+export function deriveScreen(state): Screen { /* dérive l'écran de l'état */ }
+export function toggleSelection(selected, i): number[] { /* logique de sélection */ }
+
+// 2. Hook/composant fin (vérifié par typecheck, pas de test unitaire) :
+export function useAiDriver(client, params) { useEffect(() => { /* subscribe → aiStep */ }) }
+```
+
+### Règles tacites
+- **Aucune règle de jeu côté web** : tout passe par `@pazaak/engine` (scoring, sélection
+  de coup via `chooseMove`, validation). Le web lit l'état et dispatche.
+- **Typer les clients `boardgame.io`** via `ReturnType<typeof Client<G>>` (le type interne
+  `_ClientImpl` n'est pas exporté) ; pour les fonctions pures qui ne lisent qu'un
+  sous-ensemble de l'état, un type maison minimal (`PlayerState | OpponentView`) suffit.
+  Jamais `any`.
+- **Distinguer son siège de l'adversaire** dans un client : `Array.isArray(p.hand)`
+  (PlayerState complet) vs `{ count }` (OpponentView). `ctx.currentPlayer` n'est pas fiable
+  en phase pick simultanée (`activePlayers:{all:'pick'}`).
+- **Transport `Local` synchrone** : un dispatch dans un callback `subscribe` re-notifie
+  synchroniquement → boucler via `queueMicrotask` + flag de ré-entrance.
+- **`data-testid` sur tout élément interactif** dès la création (règle absolue, consommés
+  par les e2e P7). Désactiver le Debug Panel boardgame.io (`debug:false`, cf. QUIRKS).
+- **`@pazaak/engine` est la seule source de règles** : pas de logique dupliquée côté web.

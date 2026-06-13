@@ -6,6 +6,49 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## Le Debug Panel boardgame.io recouvre l'UI et intercepte les clics (2026-06-13)
+
+**Découvert** : au playthrough navigateur de P3.2 (deck-builder).
+
+**Symptôme** : impossible de cliquer les dernières cartes du catalogue ; Playwright :
+`<section aria-label="boardgame.io Debug Panel"> subtree intercepts pointer events`.
+
+**Cause** : un client `boardgame.io` (même le client vanilla `boardgame.io/client`) monte
+par défaut un **Debug Panel** (`debug` défaut `true`) en position fixe qui recouvre une
+partie du DOM applicatif et capte les événements pointeur.
+
+**Fix** : passer `debug: false` dans les options du `Client` (`solo/clients.ts`). En plus
+de débloquer le jeu en dev, c'est nécessaire pour les e2e P7 (sélecteurs/clics du pick).
+
+**Note** : le panel n'exposait pas le secret state (la main adverse restait `{count}`),
+mais son sélecteur de client permet de basculer sur la vue de l'IA — à garder désactivé.
+
+---
+
+## boardgame.io ne réévalue pas `turn.endIf` après `turn.onBegin` (2026-06-13)
+
+**Découvert** : en pilotant une partie IA-vs-IA jusqu'au vainqueur (Task 3 P3.2, driver `aiStep`).
+
+**Symptôme** : boucle de set figée. La partie n'atteignait jamais de `matchWinner` : le
+joueur courant restait `standing` à 20 sans que le tour ne se termine ni que le set ne se
+résolve (`phase=play`, `gameover=undefined`, aucun coup légal). ~27/40 seeds touchés.
+
+**Cause** : quand la **pioche automatique de `turn.onBegin`** amène le joueur à 20 exact,
+`refreshScoreAndFlags` le met `standing=true` *à l'intérieur de onBegin*. Or boardgame.io
+ne réévalue **pas** `turn.endIf` après `onBegin`. Le tour ne se terminait donc pas, et la
+résolution de set (qui vivait dans `turn.onEnd`) n'était jamais déclenchée. Le cas
+n'apparaît que lorsque le 2ᵉ joueur à se figer le fait via auto-stand en pioche (un stand
+explicite passe par `onMove`→`endIf`→`next` et transitionne normalement) — d'où l'absence
+dans les tests engine existants (stand explicite à bas score).
+
+**Fix** (engine, commit `90c23a8` dans `game.ts`) : appeler `events.endTurn()` depuis
+`turn.onBegin` quand la pioche fige le joueur. `endTurn` est supporté depuis `onBegin`.
+
+**Leçon** : toute mutation d'état vers une condition de fin de tour faite dans `onBegin`
+doit déclencher explicitement la transition (`events.endTurn()`), `endIf` ne suffit pas.
+
+---
+
 ## Merger une PR touchant `.github/workflows/` via `gh` exige le scope `workflow` (2026-06-13)
 
 **Découvert** : en mergeant les PR Dependabot de bump d'actions.

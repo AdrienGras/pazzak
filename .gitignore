@@ -13,6 +13,9 @@ build/
 .vite/
 *.tsbuildinfo
 
+# TanStack Router — arbre de routes généré
+apps/web/src/routeTree.gen.ts
+
 # Tests
 coverage/
 test-results/

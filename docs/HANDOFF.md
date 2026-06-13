@@ -6,6 +6,71 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 
 ---
 
+## 2026-06-13 — P3.2 Solo client-local web LIVRÉ (critère P3 atteint) ★★
+
+### Dernière chose faite
+- **Partie solo complète jouable au navigateur contre l'IA** — critère de sortie **P3
+  atteint**, vérifié bout en bout au navigateur (Playwright) : accueil → choix difficulté
+  → deck-builder (10 cartes) → plateau (l'IA joue ses tours seule, déclaration ± des
+  cartes, endTurn/stand) → boucle best-of-3 résolue → écran de fin → rejouer.
+- Livré sur `feat/p3.2-web-solo` (subagent-driven, TDD là où testable) :
+  - **TanStack Start** câblé : `vite.config`, `router.tsx` (factory `getRouter`, pas
+    `createRouter`, en 1.168), app shell `__root.tsx`, routes `/` (accueil + difficulté) et
+    `/solo` (orchestration, search param `difficulty` typé via `validateSearch`).
+  - **2 clients `boardgame.io` `Local()`** (`solo/clients.ts`) : humain `'0'` + IA `'1'`,
+    **une seule** instance `Local()` partagée (= master commun). `debug:false` (le panel
+    recouvrait l'UI, cf. QUIRKS).
+  - **Driver IA** (Approche A) : `aiStep` pur + hooks `useSoloGame` (souscription) et
+    `useAiDriver` (pump `queueMicrotask` + garde anti-récursion synchrone du transport Local).
+  - Logique testable extraite en fonctions pures : `aiStep`, `deriveScreen`,
+    `toggleSelection` (+ store Zustand fin `useDeckBuilder`). Écrans + atomes UI avec
+    `data-testid` partout. 4 fichiers de test web (11 tests) + intégration IA-vs-IA.
+- **Bug moteur corrigé en cours de route** (commit `90c23a8`, cf. entrée dédiée ci-dessous /
+  QUIRKS). Tout vert : biome (69 fichiers), typecheck -r, tests (engine 127, web 11, game-server 1).
+
+### Trucs à savoir tout de suite
+- Le **fix moteur** (auto-stand `onBegin`) a touché du code « livré » P2/P3.1 — gel des
+  versions levé **explicitement** par l'utilisateur pour ce motif. Pas de changement
+  RULES/contrat (comportement déjà spécifié, simple bug de câblage du flux de tours).
+- **Pas encore poussé / mergé** au moment d'écrire : branche `feat/p3.2-web-solo` prête
+  pour merge `--no-ff` dans `main` + observation CI (règle post-push).
+
+### Prochaine chose à creuser
+- **P4 — Backend Start** (server functions auth/crédits/rooms/leaderboard, SQLite réel,
+  settlement HMAC). Parallélisable avec P5 (game-server Koa). P3 est clos.
+- Nice-to-have P3.2 notés dans BACKLOG (lifecycle clients `useMemo`→`useRef`,
+  `useSyncExternalStore`, doublons deck-builder, sélecteur de difficulté visuel).
+
+### Notes pour future Claude
+- `boardgame.io/client` n'exporte pas `ClientState` → on type via `ReturnType<typeof Client<G>>`
+  (clients) et un sous-ensemble minimal maison (`aiStep`), jamais le type interne, jamais `any`.
+- Le siège local d'un client se distingue de l'adversaire par `Array.isArray(hand)`
+  (PlayerState complet) vs `{count}` (OpponentView) — `ctx.currentPlayer` n'est pas fiable
+  en phase pick simultanée (`activePlayers:{all:'pick'}`).
+- `useAiDriver` : le transport `Local` notifie ses abonnés **synchroniquement** à chaque
+  dispatch → `queueMicrotask` + flag de ré-entrance pour éviter la récursion.
+
+---
+
+## 2026-06-13 — Fix moteur : blocage de boucle de set (auto-stand onBegin) ★
+
+### Dernière chose faite
+- Corrigé un **bug latent P2/P3.1** débusqué par le test d'intégration IA-vs-IA de P3.2 :
+  quand la pioche forcée de `turn.onBegin` figeait le joueur courant (20 pile / 9 cartes),
+  le tour ne se terminait pas (boardgame.io ne réévalue pas `turn.endIf` après `onBegin`)
+  → la boucle de set se gelait (~60% des parties, prouvé par balayage de 300 seeds).
+- Fix `packages/engine/src/game.ts` (commit `90c23a8`) : `events.endTurn()` depuis
+  `turn.onBegin` quand le joueur s'auto-fige (`!isActive`). Test de non-régression
+  `set-loop-termination.test.ts` (50 seeds pilotées jusqu'au vainqueur). Engine 127 tests verts.
+
+### Notes pour future Claude
+- `events.endTurn()` depuis `turn.onBegin` est **officiellement supporté** par boardgame.io
+  (table de compatibilité « calling events from hooks », confirmé via Context7).
+- RULES/contrat **non modifiés** : le comportement était déjà spécifié, c'était un bug
+  d'implémentation. Détail mécanique dans QUIRKS.
+
+---
+
 ## 2026-06-13 — Outillage CI livré + opérationnel ★
 
 ### Dernière chose faite
