@@ -82,7 +82,9 @@ Tests : `packages/engine/test/` (9 fichiers, 50 tests) + `test/support.ts` (harn
   par tag majeur ; Dependabot (`.github/dependabot.yml`) suit les bumps d'actions.
 - **Couverture** : `pnpm test:coverage` (engine, lcov dans `packages/engine/coverage/`),
   upload Codecov via le secret repo `CODECOV_TOKEN` (le tokenless est refusé par Codecov,
-  cf. QUIRKS). Badge dans le README.
+  cf. QUIRKS). Badge dans le README. **Seuil dur** (`vitest.config.ts`, `coverage.thresholds`) :
+  le job `quality` échoue si la couverture engine passe sous **90%** (lignes/statements/
+  functions ; branches non gardées). Pas de `codecov.yml` → checks Codecov en indicatif.
 - **Hooks git** : `lefthook.yml` (installé au `pnpm install` via `prepare: lefthook
   install`). `commit-msg` → commitlint (`commitlint.config.js`, gitmoji + conventional) ;
   `pre-commit` → `biome check` sur fichiers stagés.
