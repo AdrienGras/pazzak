@@ -12,6 +12,13 @@ saveExact: true
 # casse la policy supply-chain minimumReleaseAge de pnpm (version trop fraîche).
 overrides:
   "@types/node": "24.0.0"
+  # Patche 3 vulns high transitives de boardgame.io (transport serveur socket.io/ws/cors).
+  # ws/socket.io-parser : même majeure (faible risque). @koa/cors : bump majeur 4→5 (le
+  # correctif EST la 5.0) — versions forcées non testées par boardgame.io, à valider quand
+  # le game-server tournera (P5/P6). GHSA-3h5v-q93c-6h6q / -677m-j7p3-52f9 / -qxrj-hx23-xp82.
+  ws: ">=7.5.10 <8"
+  socket.io-parser: ">=4.2.6 <5"
+  "@koa/cors": ">=5.0.0 <6"
 
 # Dépendances autorisées à exécuter leurs scripts de build natif (pnpm 11 bloque par
 # défaut). better-sqlite3 : module natif (P4). esbuild : pulled par Vite/TanStack (P3).

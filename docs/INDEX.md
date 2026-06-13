@@ -16,7 +16,7 @@ Voir aussi : `ENVIRONMENT.md` · `QUIRKS.md` · `BACKLOG.md` · `HANDOFF.md` · 
 | Système de mémoire projet (`docs/` + hook SessionStart) | 2026-06-11 | — | — | ✅ Livré | Bootstrap KB opérationnelle + hook d'injection `HANDOFF`/`INDEX` |
 | Docs de référence (contrat, RULES, BOOTSTRAP, ROADMAP) | 2026-06-11 | — | — | ✅ Livré | Déplacées dans `docs/` (P1) |
 
-| **Outillage CI (GitHub Actions + hooks + badges)** | 2026-06-13 | `superpowers/specs/2026-06-12-ci-setup-design.md` | `superpowers/plans/2026-06-12-ci-setup.md` | ✅ Livré | Workflow `ci.yml` (jobs quality+security, permissions least-privilege), couverture Codecov (engine), lefthook+commitlint gitmoji, Dependabot actions, README + 7 badges, règle post-push. Vulns high transitives boardgame.io (ws/socket.io-parser) → job security rouge, voir BACKLOG. |
+| **Outillage CI (GitHub Actions + hooks + badges)** | 2026-06-13 | `superpowers/specs/2026-06-12-ci-setup-design.md` | `superpowers/plans/2026-06-12-ci-setup.md` | ✅ Livré | Workflow `ci.yml` (jobs quality+security, permissions least-privilege), couverture Codecov (engine), lefthook+commitlint gitmoji, Dependabot actions, README + 7 badges, règle post-push. 3 vulns high transitives boardgame.io patchées via pnpm overrides (à valider en P5/P6). |
 
 ## Commandes / scripts utilitaires
 

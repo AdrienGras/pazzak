@@ -8,7 +8,7 @@ Une fois faite, déplace-la en `INDEX.md` (livré) ou supprime-la (abandonnée).
 
 ## CI / Sécurité
 
-- [ ] **Vulns high boardgame.io** (GHSA-3h5v-q93c-6h6q `ws`, GHSA-677m-j7p3-52f9 `socket.io-parser`) : le job `security` bloque en CI sur ces 3 vulns transitives. Options : (a) attendre un boardgame.io avec socket.io >4.7.2 / ws ≥7.5.10 ; (b) ajouter `overrides: { ws: ">=7.5.10", socket.io-parser: "..." }` dans `pnpm-workspace.yaml` après vérification de compatibilité ; (c) passer `--audit-level=critical` en attendant.
+- [ ] **Valider les overrides socket.io/ws/@koa/cors** quand le game-server tournera (P5/P6) : les versions forcées (dont @koa/cors 5.x majeure) ne sont pas testées par boardgame.io. Si un bug de transport apparaît, ré-évaluer.
 - [ ] **Token Codecov** : configurer OIDC ou secret `CODECOV_TOKEN` sur GitHub pour activer les uploads de couverture en vraie CI.
 - [ ] **e2e en CI** (P7) : workflow séparé contre `docker compose up` + `playwright install`. Hors périmètre de la CI initiale.
 - [ ] **Étendre la couverture** aux autres packages quand ils auront de vrais tests (web/game-server en P4+), avec flags Codecov par package.

@@ -39,19 +39,25 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
-## boardgame.io → vulns high transitives `ws` + `socket.io-parser` (2026-06-13)
+## boardgame.io → vulns high transitives `ws` + `socket.io-parser` + `@koa/cors` (2026-06-13)
 
 **Découvert** : `pnpm audit --audit-level=high` (job `security` du CI).
 
 **Symptôme** : 3 vulns `high` dans l'arbre de dépendances de boardgame.io :
 - `ws <7.5.10` → DoS via HTTP headers (GHSA-3h5v-q93c-6h6q). Chemin : `boardgame.io > koa-socket-2 > socket.io > engine.io > ws`.
-- `socket.io-parser` → ReDoS (GHSA-677m-j7p3-52f9). Chemin : `boardgame.io > koa-socket-2 > socket.io > socket.io-parser`.
+- `socket.io-parser <4.2.6` → ReDoS (GHSA-677m-j7p3-52f9). Chemin : `boardgame.io > koa-socket-2 > socket.io > socket.io-parser`.
+- `@koa/cors <5.0.0` → origine trop permissive (GHSA-qxrj-hx23-xp82). Chemin : `boardgame.io > @koa/cors`.
 
-**Cause** : boardgame.io épingle des versions de socket.io/ws non patchées.
+**Cause** : boardgame.io épingle des versions de socket.io/ws/@koa/cors non patchées.
 
-**Décision** : non patchées. Le job `security` bloquera en CI sur tout PR vers main tant que boardgame.io n'a pas mis à jour ses deps ou qu'un `overrides` n'est pas ajouté dans `pnpm-workspace.yaml`. Voir BACKLOG.
+**Statut** : **PATCHÉES** via `pnpm overrides` dans `pnpm-workspace.yaml` :
+- `ws: ">=7.5.10 <8"` (même majeure, faible risque)
+- `socket.io-parser: ">=4.2.6 <5"` (même majeure, faible risque)
+- `@koa/cors: ">=5.0.0 <6"` (bump majeur 4→5 — le correctif EST la 5.0)
 
-**Référence** : `docs/BACKLOG.md`, `pnpm-workspace.yaml` (pour un éventuel override)
+**Caveat** : les versions forcées (en particulier `@koa/cors` 5.x) ne sont pas testées par boardgame.io. Ces dépendances ne sont utilisées que par le game-server (transport websocket, P5/P6). **À revalider quand le game-server tournera (P5/P6)** — si un bug de transport apparaît, ré-évaluer.
+
+**Référence** : `pnpm-workspace.yaml` (overrides), `docs/BACKLOG.md`
 
 ---
 
