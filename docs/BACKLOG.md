@@ -6,6 +6,11 @@ Une fois faite, déplace-la en `INDEX.md` (livré) ou supprime-la (abandonnée).
 
 ---
 
+## CI / Sécurité
+
+- [ ] **Vulns high boardgame.io** (GHSA-3h5v-q93c-6h6q `ws`, GHSA-677m-j7p3-52f9 `socket.io-parser`) : le job `security` bloque en CI sur ces 3 vulns transitives. Options : (a) attendre un boardgame.io avec socket.io >4.7.2 / ws ≥7.5.10 ; (b) ajouter `overrides: { ws: ">=7.5.10", socket.io-parser: "..." }` dans `pnpm-workspace.yaml` après vérification de compatibilité ; (c) passer `--audit-level=critical` en attendant.
+- [ ] **Token Codecov** : configurer OIDC ou secret `CODECOV_TOKEN` sur GitHub pour activer les uploads de couverture en vraie CI.
+
 ## Outillage / deps
 
 - [ ] **argon2** : ajouter `argon2: true` à `allowBuilds` (pnpm-workspace.yaml) et l'épingler quand l'auth web arrive (P4). Pas installé en P1 (hors liste de pin P1).

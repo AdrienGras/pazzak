@@ -6,6 +6,33 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 
 ---
 
+## 2026-06-13 — CI-3 Workflow GitHub Actions livré ★
+
+### Dernière chose faite
+- Créé `.github/workflows/ci.yml` avec deux jobs :
+  - `quality` : checkout → pnpm setup → install frozen → `pnpm check` → `pnpm typecheck` → `pnpm test:coverage` → upload Codecov (`fail_ci_if_error: false`).
+  - `security` : checkout → pnpm setup → install frozen → `pnpm audit --audit-level=high`.
+- Validé avec `act pull_request` (image `catthehacker/ubuntu:act-latest`) :
+  - `quality` → **Job succeeded** (Codecov loggue "Token required" mais ne bloque pas).
+  - `security` → **Job failed** : 3 vulns **high** dans les deps transitives de `boardgame.io` (`ws` CVE GHSA-3h5v-q93c-6h6q + `socket.io-parser` CVE GHSA-677m-j7p3-52f9). Non patchées volontairement.
+
+### Trucs en suspens
+- **Vulns high dans boardgame.io** (transitif) : `ws <7.5.10` (DoS HTTP headers) et `socket.io-parser` (ReDoS). Le job `security` bloquera en CI sur main jusqu'à ce que boardgame.io publie une version corrigée ou qu'un override soit ajouté dans `pnpm-workspace.yaml`.
+- **Bloc P3.2 (web)** toujours non commencé.
+- **CI-4 → CI-7** toujours en attente.
+
+### Prochaine chose à creuser
+- CI-4 : Dependabot pour github-actions (`.github/dependabot.yml`).
+- CI-5 : README + 7 badges.
+- Décision sur la stratégie vulns : override `ws` dans workspace ou attendre boardgame.io upstream ?
+
+### Notes pour future Claude
+- L'image `act` `catthehacker/ubuntu:act-latest` est déjà pull locale (≈ pas besoin de re-télécharger).
+- `act` ne passe pas de token Codecov → l'upload échoue silencieusement ("Token required") mais le job passe grâce à `fail_ci_if_error: false`. En vraie CI GitHub, ça fonctionnera avec OIDC ou un secret `CODECOV_TOKEN`.
+- `pnpm audit` exit code 1 si au moins une vuln ≥ niveau demandé. Les 3 high sont dans le sous-arbre `boardgame.io > koa-socket-2 > socket.io > engine.io > ws`.
+
+---
+
 ## 2026-06-12 — P3.1 Moteur bust-recovery + IA livré ★
 
 ### Dernière chose faite

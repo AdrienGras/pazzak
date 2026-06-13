@@ -16,6 +16,8 @@ Voir aussi : `ENVIRONMENT.md` · `QUIRKS.md` · `BACKLOG.md` · `HANDOFF.md` · 
 | Système de mémoire projet (`docs/` + hook SessionStart) | 2026-06-11 | — | — | ✅ Livré | Bootstrap KB opérationnelle + hook d'injection `HANDOFF`/`INDEX` |
 | Docs de référence (contrat, RULES, BOOTSTRAP, ROADMAP) | 2026-06-11 | — | — | ✅ Livré | Déplacées dans `docs/` (P1) |
 
+| **CI-3 — Workflow GitHub Actions** | 2026-06-13 | — | — | ✅ Livré | `.github/workflows/ci.yml` : jobs `quality` (check + typecheck + test:coverage + codecov) et `security` (`pnpm audit --audit-level=high`). Validé localement avec `act`. 3 high vulns dans boardgame.io→ws/socket.io-parser (transitives) → non patchées, à surveiller post-push. |
+
 ## Commandes / scripts utilitaires
 
 | Commande | Date | Cible |

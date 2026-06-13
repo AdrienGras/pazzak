@@ -6,6 +6,36 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## `act` + Codecov : upload échoue sans token mais ne bloque pas le job (2026-06-13)
+
+**Découvert** : lors de la validation `act` du job `quality` (CI-3).
+
+**Symptôme** : Codecov log `"Token required - not valid tokenless upload"` → exit code non-nul côté Codecov CLI, mais le step GitHub Actions se termine en succès.
+
+**Cause** : `codecov/codecov-action@v5` est configuré avec `fail_ci_if_error: false`. En vraie CI GitHub, OIDC ou un secret `CODECOV_TOKEN` prend le relais.
+
+**Implication** : le job `quality` passe localement avec `act` ; en production, l'upload réussira si le repo est configuré sur Codecov avec OIDC ou un token secret.
+
+**Référence** : `.github/workflows/ci.yml` (step codecov/codecov-action@v5)
+
+---
+
+## boardgame.io → vulns high transitives `ws` + `socket.io-parser` (2026-06-13)
+
+**Découvert** : `pnpm audit --audit-level=high` (job `security` du CI).
+
+**Symptôme** : 3 vulns `high` dans l'arbre de dépendances de boardgame.io :
+- `ws <7.5.10` → DoS via HTTP headers (GHSA-3h5v-q93c-6h6q). Chemin : `boardgame.io > koa-socket-2 > socket.io > engine.io > ws`.
+- `socket.io-parser` → ReDoS (GHSA-677m-j7p3-52f9). Chemin : `boardgame.io > koa-socket-2 > socket.io > socket.io-parser`.
+
+**Cause** : boardgame.io épingle des versions de socket.io/ws non patchées.
+
+**Décision** : non patchées. Le job `security` bloquera en CI sur tout PR vers main tant que boardgame.io n'a pas mis à jour ses deps ou qu'un `overrides` n'est pas ajouté dans `pnpm-workspace.yaml`. Voir BACKLOG.
+
+**Référence** : `docs/BACKLOG.md`, `pnpm-workspace.yaml` (pour un éventuel override)
+
+---
+
 ## Bust finalisé à la conclusion du tour, pas à la pioche (2026-06-12)
 
 **Découvert / décidé** : en P3, en branchant l'IA (le branch « éviter le bust » du
