@@ -6,6 +6,25 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## Le Debug Panel boardgame.io recouvre l'UI et intercepte les clics (2026-06-13)
+
+**Découvert** : au playthrough navigateur de P3.2 (deck-builder).
+
+**Symptôme** : impossible de cliquer les dernières cartes du catalogue ; Playwright :
+`<section aria-label="boardgame.io Debug Panel"> subtree intercepts pointer events`.
+
+**Cause** : un client `boardgame.io` (même le client vanilla `boardgame.io/client`) monte
+par défaut un **Debug Panel** (`debug` défaut `true`) en position fixe qui recouvre une
+partie du DOM applicatif et capte les événements pointeur.
+
+**Fix** : passer `debug: false` dans les options du `Client` (`solo/clients.ts`). En plus
+de débloquer le jeu en dev, c'est nécessaire pour les e2e P7 (sélecteurs/clics du pick).
+
+**Note** : le panel n'exposait pas le secret state (la main adverse restait `{count}`),
+mais son sélecteur de client permet de basculer sur la vue de l'IA — à garder désactivé.
+
+---
+
 ## boardgame.io ne réévalue pas `turn.endIf` après `turn.onBegin` (2026-06-13)
 
 **Découvert** : en pilotant une partie IA-vs-IA jusqu'au vainqueur (Task 3 P3.2, driver `aiStep`).

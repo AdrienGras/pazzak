@@ -11,7 +11,7 @@ Carte des paths, conteneurs, services, accès. À jour au fil des découvertes.
 - **Path hôte** : `/srv/AdrienGras/pazzak`
 - **Branche par défaut** : `main`
 - **Convention de merge** : feature branches + conventional commits (`feat(engine): …`), **mergées dans `main` en fin de livraison (`--no-ff`, pas de PR)**. Ne jamais commiter directement sur `main`.
-- **État** : **P1 + P2 livrés et mergés dans `main`.** Monorepo bootstrappé + **moteur Pazaak complet** (`@pazaak/engine`). `apps/*` et `shared` encore en placeholders. Prochaine phase ROADMAP : **P3 (solo client-local : IA + écrans web)**.
+- **État** : **P1, P2, P3 livrés.** Monorepo + **moteur Pazaak complet** (`@pazaak/engine`) + **solo client-local jouable** (`apps/web`, P3.2 — TanStack Start + écrans + IA sur client `Local()`). `apps/game-server` et `shared` encore en placeholders. Prochaine phase ROADMAP : **P4 (backend Start : auth/crédits/rooms/leaderboard, SQLite, settlement HMAC)**, parallélisable avec **P5 (game-server Koa)**.
 
 ## Toolchain (IMPORTANT)
 
@@ -44,7 +44,7 @@ pnpm e2e                      # Playwright (P7 ; suppose la stack docker démarr
 |---|---|---|---|
 | `packages/engine` | `@pazaak/engine` | Noyau règles (P2 ✅, IA→P3) | `boardgame.io` 0.50.2 |
 | `packages/shared` | `@pazaak/shared` | Types inter-services | — (zéro dep) |
-| `apps/web` | `@pazaak/web` | Front TanStack Start + SQLite | `@tanstack/react-start` 1.168.25, `react` 19.2.7, `zustand` 5.0.14, `better-sqlite3` 12.10.0, `boardgame.io` 0.50.2 |
+| `apps/web` | `@pazaak/web` | Front TanStack Start + SQLite ; **solo client-local jouable (P3.2)** | `@tanstack/react-start` 1.168.25, `@tanstack/react-router` 1.170.15, `react` 19.2.7, `zustand` 5.0.14, `better-sqlite3` 12.10.0, `boardgame.io` 0.50.2 ; devDeps `vite` 8.x, `@vitejs/plugin-react` 6.x |
 | `apps/game-server` | `@pazaak/game-server` | Server Koa boardgame.io | `boardgame.io` 0.50.2, `koa` 3.2.1 |
 | `e2e` | `@pazaak/e2e` | Playwright (P7) | `@playwright/test` 1.60.0 (devDep) |
 
@@ -63,7 +63,26 @@ Outillage : `typescript` 6.0.3, `@biomejs/biome` 2.4.16 (racine), `vitest` 4.1.8
 | `game.ts` | `PazaakGame` (Game boardgame.io), `initialState`, phases `pickSideDeck`/`play`, boucle de match |
 | `index.ts` | API publique |
 
-Tests : `packages/engine/test/` (9 fichiers, 50 tests) + `test/support.ts` (harnais Client headless). Invariants fast-check : `invariants.test.ts` (1000 runs). **L'IA (`ai.ts`) arrive en P3.**
+Tests : `packages/engine/test/` (13 fichiers, **127 tests**) + `test/support.ts` (harnais Client headless seedé). Invariants fast-check : `invariants.test.ts` (1000 runs). IA pure : `ai.ts` (`chooseMove`/`chooseSideDeck`, P3.1). Non-régression boucle de set : `set-loop-termination.test.ts` (P3.2).
+
+### `apps/web/src` — structure (P3.2)
+
+| Chemin | Rôle |
+|---|---|
+| `vite.config.ts`, `router.tsx` | Plomberie TanStack Start (plugin `tanstackStart()` + `viteReact()`) ; factory `getRouter` + `routeTree.gen.ts` (généré, gitignoré) |
+| `routes/__root.tsx` | App shell (header + `<Outlet/>`) |
+| `routes/index.tsx` | Accueil + sélecteur de difficulté (liens `/solo?difficulty=`) |
+| `routes/solo.tsx` | Orchestration du match (search param typé, clients, hooks, écran dérivé) |
+| `solo/clients.ts` | Factory des 2 clients `Local()` (`debug:false`) |
+| `solo/difficulty.ts` | `Difficulty` → `AiParams` (`standThreshold` 19/18/17) |
+| `solo/ai-driver.ts` | `aiStep` (pilotage IA pur, Approche A) |
+| `solo/screen.ts` | `deriveScreen` (pick/play/gameover) |
+| `solo/selection.ts` | `toggleSelection` + `DECK_SIZE` |
+| `solo/use-solo-game.ts`, `solo/use-ai-driver.ts` | Hooks de souscription / pilotage |
+| `store.ts` | Zustand `useDeckBuilder` (buffer de sélection) |
+| `components/` | `CardView`, `PlayerPanel`, `HandView`, `DeckBuilder`, `Board`, `GameOver` (data-testid partout) |
+
+Serveur de dev : `pnpm dev` dans `apps/web` (ou `pnpm dev` racine) → **Vite sur port 3000**. Tests web : `apps/web/test/` (4 fichiers, 11 tests : clients, ai-driver, screen, selection). Pas de tests de composants (UI couverte par e2e P7).
 
 ## Services actifs
 
