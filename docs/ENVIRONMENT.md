@@ -81,13 +81,14 @@ Tests : `packages/engine/test/` (9 fichiers, 50 tests) + `test/support.ts` (harn
   contents: read` (top) + `id-token: write` sur `quality` (Codecov OIDC). Actions épinglées
   par tag majeur ; Dependabot (`.github/dependabot.yml`) suit les bumps d'actions.
 - **Couverture** : `pnpm test:coverage` (engine, lcov dans `packages/engine/coverage/`),
-  upload Codecov tokenless (repo public). Badge dans le README.
+  upload Codecov via le secret repo `CODECOV_TOKEN` (le tokenless est refusé par Codecov,
+  cf. QUIRKS). Badge dans le README.
 - **Hooks git** : `lefthook.yml` (installé au `pnpm install` via `prepare: lefthook
   install`). `commit-msg` → commitlint (`commitlint.config.js`, gitmoji + conventional) ;
   `pre-commit` → `biome check` sur fichiers stagés.
 - **Validation locale** : `act pull_request -j <job> -P ubuntu-latest=catthehacker/ubuntu:act-latest`.
-- **À activer côté Settings GitHub** : Dependabot security alerts (npm) + lier le repo à
-  Codecov (OIDC/token) pour peupler le badge.
+- **À activer côté Settings GitHub** : Dependabot security alerts (npm). ✅ Codecov : repo
+  lié + secret `CODECOV_TOKEN` ajouté (2026-06-13) → upload OK, badge peuplé.
 
 ## Variables d'environnement
 

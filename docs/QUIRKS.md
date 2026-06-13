@@ -6,6 +6,23 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## Codecov refuse le tokenless → `CODECOV_TOKEN` requis (2026-06-13)
+
+**Découvert** : au premier run CI réel (le spec supposait « Codecov tokenless » sur repo public).
+
+**Symptôme** : `codecov-action` log `-> Token length: 0` puis `error -- Upload queued for
+processing failed: {"message":"Token required - not valid tokenless upload"}`. Le step
+reste vert (`fail_ci_if_error: false`) mais **aucune donnée n'est ingérée** → badge README
+« unknown ». L'`id-token: write` (OIDC) ne suffit pas non plus.
+
+**Fix** : créer le repo sur codecov.io → récupérer l'upload token → l'ajouter en secret
+GitHub `CODECOV_TOKEN` → `with: { token: ${{ secrets.CODECOV_TOKEN }} }` sur le step.
+Confirmé : `Token length: 36` + `Upload queued for processing complete`, badge peuplé.
+
+**Référence** : `.github/workflows/ci.yml` (step codecov), `docs/ENVIRONMENT.md`.
+
+---
+
 ## CI : lefthook (allowBuilds), commitlint gitmoji, coverage lockstep (2026-06-13)
 
 **Découvert** : mise en place de la CI.
