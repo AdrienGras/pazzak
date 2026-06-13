@@ -6,6 +6,13 @@ Une fois faite, déplace-la en `INDEX.md` (livré) ou supprime-la (abandonnée).
 
 ---
 
+## CI / Sécurité
+
+- [ ] **Valider les overrides socket.io/ws/@koa/cors** quand le game-server tournera (P5/P6) : les versions forcées (dont @koa/cors 5.x majeure) ne sont pas testées par boardgame.io. Si un bug de transport apparaît, ré-évaluer.
+- [ ] **Token Codecov** : configurer OIDC ou secret `CODECOV_TOKEN` sur GitHub pour activer les uploads de couverture en vraie CI.
+- [ ] **e2e en CI** (P7) : workflow séparé contre `docker compose up` + `playwright install`. Hors périmètre de la CI initiale.
+- [ ] **Étendre la couverture** aux autres packages quand ils auront de vrais tests (web/game-server en P4+), avec flags Codecov par package.
+
 ## Outillage / deps
 
 - [ ] **argon2** : ajouter `argon2: true` à `allowBuilds` (pnpm-workspace.yaml) et l'épingler quand l'auth web arrive (P4). Pas installé en P1 (hors liste de pin P1).

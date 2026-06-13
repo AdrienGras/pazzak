@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # Garde les versions d'actions GitHub à jour. npm volontairement absent (gel des
+  # versions applicatives, cf. CLAUDE.md). Les alertes de sécurité npm passent par
+  # Dependabot natif (Settings du repo), pas par des PR de bump de routine.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

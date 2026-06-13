@@ -56,6 +56,15 @@ Monorepo TypeScript : jeu de Pazaak (KOTOR) avec mode solo contre IA et mode ran
   et du scope. Format : `<emoji> type(scope): sujet`.
   Ex. : `✨ feat(engine): IA heuristique`, `🐛 fix(web): …`, `📝 docs(p3): …`,
   `♻️ refactor(engine): …`, `✅ test(engine): …`, `🔧 chore: …`.
+- **Observation CI post-push (NON-NÉGOCIABLE).** Après chaque push (dans une session),
+  observer le run CI jusqu'à la fin (`gh run watch`) et rapporter le résultat. Si un job
+  `quality` échoue → triage et proposition de correction. Si une remontée de sécurité
+  apparaît (job `security` rouge ou alerte Dependabot) : **ne jamais patcher
+  automatiquement** ; d'abord rechercher l'impact du bump (changelog, semver, direct vs
+  transitive, contrainte du lockfile), puis **proposer** — patch prêt avec preuve de
+  non-régression si non-breaking, ou présentation des impacts/options si breaking. Jamais
+  d'application sans accord. C'est le canal explicite qui lève le gel des versions pour un
+  motif de sécurité.
 
 ## Commandes
 

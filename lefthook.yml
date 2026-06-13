@@ -1,0 +1,11 @@
+# Hooks git locaux (cf. spec CI §4.4). Installés au pnpm install via "prepare".
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm exec commitlint --edit {1}
+
+pre-commit:
+  commands:
+    biome:
+      glob: "*.{js,jsx,ts,tsx,json,jsonc}"
+      run: pnpm exec biome check {staged_files}

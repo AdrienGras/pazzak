@@ -6,6 +6,34 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 
 ---
 
+## 2026-06-13 — Outillage CI livré ★
+
+### Dernière chose faite
+- CI GitHub Actions (`ci.yml`) : jobs `quality` (check + typecheck + test:coverage +
+  Codecov, permissions least-privilege) et `security` (`pnpm audit --audit-level=high`).
+  Validé end-to-end via `act` (quality vert ; security rouge sur 3 vulns boardgame.io).
+- Couverture vitest v8 (engine, lcov) → Codecov tokenless. Hooks lefthook (commit-msg →
+  commitlint gitmoji ; pre-commit → biome). Dependabot (actions). README + 7 badges.
+- Règle post-push ajoutée à `CLAUDE.md` (observer la CI ; sur remontée sécu : rechercher
+  puis proposer un patch, jamais auto).
+
+### Trucs en suspens
+- **Vulns high dans boardgame.io** (transitif) : `ws <7.5.10` (DoS HTTP headers) et `socket.io-parser` (ReDoS). Le job `security` bloquera en CI sur main jusqu'à ce que boardgame.io publie une version corrigée ou qu'un override soit ajouté dans `pnpm-workspace.yaml`.
+- **Bloc P3.2 (web)** toujours non commencé.
+- **CI-4 → CI-7** toujours en attente.
+
+### Prochaine chose à creuser
+- CI-4 : Dependabot pour github-actions (`.github/dependabot.yml`).
+- CI-5 : README + 7 badges.
+- Décision sur la stratégie vulns : override `ws` dans workspace ou attendre boardgame.io upstream ?
+
+### Notes pour future Claude
+- L'image `act` `catthehacker/ubuntu:act-latest` est déjà pull locale (≈ pas besoin de re-télécharger).
+- `act` ne passe pas de token Codecov → l'upload échoue silencieusement ("Token required") mais le job passe grâce à `fail_ci_if_error: false`. En vraie CI GitHub, ça fonctionnera avec OIDC ou un secret `CODECOV_TOKEN`.
+- `pnpm audit` exit code 1 si au moins une vuln ≥ niveau demandé. Les 3 high sont dans le sous-arbre `boardgame.io > koa-socket-2 > socket.io > engine.io > ws`.
+
+---
+
 ## 2026-06-12 — P3.1 Moteur bust-recovery + IA livré ★
 
 ### Dernière chose faite

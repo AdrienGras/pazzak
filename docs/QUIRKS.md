@@ -6,6 +6,61 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## CI : lefthook (allowBuilds), commitlint gitmoji, coverage lockstep (2026-06-13)
+
+**Découvert** : mise en place de la CI.
+
+- **lefthook** a un postinstall natif → il faut `lefthook: true` dans `allowBuilds`
+  (`pnpm-workspace.yaml`), sinon le binaire n'est pas posé et `prepare: lefthook install`
+  échoue.
+- **commitlint + gitmoji** : `@commitlint/config-conventional` seul rejette le préfixe
+  emoji. On surcharge `parserPreset.parserOpts.headerPattern` (emoji unicode non capturé
+  en tête) + `headerCorrespondence`, on désactive `subject-case`, et un `ignores` laisse
+  passer les merges `🔀 Merge:`. Un commit sans emoji est rejeté (type/subject vides).
+- **`@vitest/coverage-v8`** doit être **exactement** la version de `vitest` (4.1.8) —
+  ils sortent en lockstep, un écart casse `vitest run --coverage`.
+- En CI (runner propre), pas de rtk : `pnpm check`/`audit` s'appellent directement.
+
+**Référence** : `lefthook.yml`, `commitlint.config.js`, `packages/engine/vitest.config.ts`.
+
+---
+
+## `act` + Codecov : upload échoue sans token mais ne bloque pas le job (2026-06-13)
+
+**Découvert** : lors de la validation `act` du job `quality` (CI-3).
+
+**Symptôme** : Codecov log `"Token required - not valid tokenless upload"` → exit code non-nul côté Codecov CLI, mais le step GitHub Actions se termine en succès.
+
+**Cause** : `codecov/codecov-action@v5` est configuré avec `fail_ci_if_error: false`. En vraie CI GitHub, OIDC ou un secret `CODECOV_TOKEN` prend le relais.
+
+**Implication** : le job `quality` passe localement avec `act` ; en production, l'upload réussira si le repo est configuré sur Codecov avec OIDC ou un token secret.
+
+**Référence** : `.github/workflows/ci.yml` (step codecov/codecov-action@v5)
+
+---
+
+## boardgame.io → vulns high transitives `ws` + `socket.io-parser` + `@koa/cors` (2026-06-13)
+
+**Découvert** : `pnpm audit --audit-level=high` (job `security` du CI).
+
+**Symptôme** : 3 vulns `high` dans l'arbre de dépendances de boardgame.io :
+- `ws <7.5.10` → DoS via HTTP headers (GHSA-3h5v-q93c-6h6q). Chemin : `boardgame.io > koa-socket-2 > socket.io > engine.io > ws`.
+- `socket.io-parser <4.2.6` → ReDoS (GHSA-677m-j7p3-52f9). Chemin : `boardgame.io > koa-socket-2 > socket.io > socket.io-parser`.
+- `@koa/cors <5.0.0` → origine trop permissive (GHSA-qxrj-hx23-xp82). Chemin : `boardgame.io > @koa/cors`.
+
+**Cause** : boardgame.io épingle des versions de socket.io/ws/@koa/cors non patchées.
+
+**Statut** : **PATCHÉES** via `pnpm overrides` dans `pnpm-workspace.yaml` :
+- `ws: ">=7.5.10 <8"` (même majeure, faible risque)
+- `socket.io-parser: ">=4.2.6 <5"` (même majeure, faible risque)
+- `@koa/cors: ">=5.0.0 <6"` (bump majeur 4→5 — le correctif EST la 5.0)
+
+**Caveat** : les versions forcées (en particulier `@koa/cors` 5.x) ne sont pas testées par boardgame.io. Ces dépendances ne sont utilisées que par le game-server (transport websocket, P5/P6). **À revalider quand le game-server tournera (P5/P6)** — si un bug de transport apparaît, ré-évaluer.
+
+**Référence** : `pnpm-workspace.yaml` (overrides), `docs/BACKLOG.md`
+
+---
+
 ## Bust finalisé à la conclusion du tour, pas à la pioche (2026-06-12)
 
 **Découvert / décidé** : en P3, en branchant l'IA (le branch « éviter le bust » du

@@ -73,6 +73,22 @@ Tests : `packages/engine/test/` (9 fichiers, 50 tests) + `test/support.ts` (harn
 | `apps/game-server` | Koa boardgame.io + Lobby API + webhook `onEnd` HMAC | `GAME_SERVER_PORT` (défaut 8000) |
 | SQLite | Persistance web (`DATABASE_PATH`, défaut `./data/pazaak.db`) | fichier local, créé/migré au boot (P4) |
 
+## CI / outillage qualité
+
+- **GitHub Actions** `.github/workflows/ci.yml` : job `quality` (install --frozen-lockfile
+  → `pnpm check` → `typecheck` → `test:coverage` → upload Codecov) et job `security`
+  (`pnpm audit --audit-level=high`). Déclencheurs : push `main` + PR. `permissions:
+  contents: read` (top) + `id-token: write` sur `quality` (Codecov OIDC). Actions épinglées
+  par tag majeur ; Dependabot (`.github/dependabot.yml`) suit les bumps d'actions.
+- **Couverture** : `pnpm test:coverage` (engine, lcov dans `packages/engine/coverage/`),
+  upload Codecov tokenless (repo public). Badge dans le README.
+- **Hooks git** : `lefthook.yml` (installé au `pnpm install` via `prepare: lefthook
+  install`). `commit-msg` → commitlint (`commitlint.config.js`, gitmoji + conventional) ;
+  `pre-commit` → `biome check` sur fichiers stagés.
+- **Validation locale** : `act pull_request -j <job> -P ubuntu-latest=catthehacker/ubuntu:act-latest`.
+- **À activer côté Settings GitHub** : Dependabot security alerts (npm) + lier le repo à
+  Codecov (OIDC/token) pour peupler le badge.
+
 ## Variables d'environnement
 
 - `.env.example` (commité) — documente les variables, sans valeurs sensibles.

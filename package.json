@@ -8,17 +8,22 @@
 		"node": ">=24"
 	},
 	"scripts": {
+		"prepare": "lefthook install",
 		"lint": "biome lint .",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"check": "biome check .",
 		"typecheck": "pnpm -r typecheck",
 		"test": "pnpm -r test",
+		"test:coverage": "pnpm --filter @pazaak/engine exec vitest run --coverage",
 		"dev": "pnpm -r --parallel --filter @pazaak/web --filter @pazaak/game-server dev",
 		"e2e": "pnpm --filter @pazaak/e2e e2e"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.16",
+		"@commitlint/cli": "21.0.2",
+		"@commitlint/config-conventional": "21.0.2",
+		"lefthook": "2.1.9",
 		"typescript": "6.0.3"
 	}
 }
