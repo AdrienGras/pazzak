@@ -21,6 +21,9 @@ export function createSoloClients(matchID: string): {
 		numPlayers: 2,
 		matchID,
 		multiplayer,
+		// Panneau de debug boardgame.io désactivé : il recouvre l'UI et intercepte les
+		// clics (gêne le jeu en dev et bloquerait les e2e P7 du pick). Cf. QUIRKS.
+		debug: false,
 	} as const;
 	return {
 		human: Client({ ...common, playerID: "0" }),
