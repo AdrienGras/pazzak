@@ -19,11 +19,13 @@ test("deux sièges pilotés par l'IA jouent jusqu'à un vainqueur", () => {
 		}
 	}
 
-	const final = human.getState();
-	expect(final?.G.matchWinner).not.toBeNull();
-	expect(["0", "1"]).toContain(final?.G.matchWinner);
-	const winner = final?.G.matchWinner;
-	expect(final?.G.players[winner!]?.setsWon).toBe(3);
+	const winner = human.getState()?.G.matchWinner;
+	expect(winner).not.toBeNull();
+	expect(["0", "1"]).toContain(winner);
+	if (winner == null) {
+		throw new Error("inatteignable : matchWinner non null vérifié ci-dessus");
+	}
+	expect(human.getState()?.G.players[winner]?.setsWon).toBe(3);
 
 	human.stop();
 	ai.stop();
