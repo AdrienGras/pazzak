@@ -13,8 +13,9 @@ build/
 .vite/
 *.tsbuildinfo
 
-# TanStack Router — arbre de routes généré
-apps/web/src/routeTree.gen.ts
+# Note : apps/web/src/routeTree.gen.ts (arbre de routes TanStack généré) est COMMITÉ
+# — la CI lance `tsc` sans build préalable, donc le fichier doit exister. Régénéré au
+# `vite dev`/`build`. Biome l'ignore (pattern *.gen.ts). Cf. QUIRKS + BACKLOG.
 
 # Tests
 coverage/
