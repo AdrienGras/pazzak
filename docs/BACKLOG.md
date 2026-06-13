@@ -43,6 +43,10 @@ Une fois faite, déplace-la en `INDEX.md` (livré) ou supprime-la (abandonnée).
   les 18 du catalogue. Pazaak réel autorise des doublons selon la collection — raffinement P8.
 - [ ] **Sélecteur de difficulté visuel** + écran de règles, animations de reveal (P8 polish).
   Le mapping difficulté→`standThreshold` (19/18/17) est déjà câblé.
+- [ ] **Génération de `routeTree.gen.ts` en CI** plutôt que de committer le fichier :
+  ajouter `@tanstack/router-cli` (`tsr generate`) et l'appeler avant `typecheck` (ou un
+  pré-step). Évite la dérive du fichier généré commité. Nécessite une dépendance
+  structurante (gelée) → demander accord avant. Cf. QUIRKS « routeTree.gen.ts doit être commité ».
 
 ## Docker
 

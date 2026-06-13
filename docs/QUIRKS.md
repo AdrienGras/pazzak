@@ -6,6 +6,27 @@ Comportements non-évidents découverts au fil du projet. Un H2 par quirk, avec 
 
 ---
 
+## `routeTree.gen.ts` doit être commité (la CI typecheck sans build) (2026-06-13)
+
+**Découvert** : run CI `quality` rouge après le merge de P3.2 (vert en local).
+
+**Symptôme** : `tsc --noEmit` échoue en CI avec `Cannot find module './routeTree.gen'` +
+`Argument of type '"/"' is not assignable to parameter of type 'undefined'` (et `"/solo"`).
+Vert en local parce que le serveur de dev avait généré le fichier.
+
+**Cause** : `apps/web/src/routeTree.gen.ts` est généré par le plugin `tanstackStart()`
+**uniquement** au `vite dev`/`build`. Le job CI `quality` lance `pnpm check` → `typecheck`
+**sans build** → le fichier n'existe pas → l'import de `router.tsx` casse et les routes ne
+sont plus typées (`Link to` devient `undefined`). Aucun générateur CLI (`tsr`) n'est installé.
+
+**Fix** : **committer** `routeTree.gen.ts` (retiré du `.gitignore`). Déterministe, ignoré
+par Biome (`*.gen.ts`). Régénéré au `vite dev`/`build`.
+
+**Piège résiduel** : si on modifie les routes sans relancer dev/build, le fichier commité
+dérive. À surveiller (option « générer en CI via `@tanstack/router-cli` » notée en BACKLOG).
+
+---
+
 ## Le Debug Panel boardgame.io recouvre l'UI et intercepte les clics (2026-06-13)
 
 **Découvert** : au playthrough navigateur de P3.2 (deck-builder).
