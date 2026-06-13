@@ -14,6 +14,7 @@
 		"check": "biome check .",
 		"typecheck": "pnpm -r typecheck",
 		"test": "pnpm -r test",
+		"test:coverage": "pnpm --filter @pazaak/engine exec vitest run --coverage",
 		"dev": "pnpm -r --parallel --filter @pazaak/web --filter @pazaak/game-server dev",
 		"e2e": "pnpm --filter @pazaak/e2e e2e"
 	},
