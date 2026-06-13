@@ -6,6 +6,34 @@ Notes informelles à destination de la prochaine session (humaine ou Claude). Fo
 
 ---
 
+## 2026-06-13 — P3.2 Task 3 : driver IA `aiStep` + test intégration deux sièges ★
+
+### Dernière chose faite
+- `apps/web/src/solo/ai-driver.ts` : `aiStep(state, moves, params): boolean` (≤1 coup
+  par appel, no-op si état null ou `isActive===false`). Délègue à `chooseMove`/`chooseSideDeck`
+  de l'engine. **Identification du siège local** via le discriminant « `hand` est un Array »
+  (PlayerState complet) vs `{count}` (OpponentView) — plus robuste que `ctx.currentPlayer`,
+  peu fiable pendant le stage simultané `pickSideDeck` `{ all: 'pick' }`. `any`-free
+  (type guard `p is PlayerState`, args `unknown[]`).
+- `apps/web/test/ai-driver.test.ts` : test headless IA-vs-IA jusqu'à `matchWinner`.
+  **PASSE** : winner `'1'`, 3 sets gagnés, ~30 dispatches `aiStep`, partie sur 4 sets.
+- Commit `7113fcf` sur `feat/p3.2-web-solo`. Typecheck + biome verts.
+
+### Trucs à savoir tout de suite
+- Le test reposait sur un **bug moteur** (auto-stand en pioche `onBegin` ne terminait pas
+  le tour) que ce chantier a débusqué → corrigé en amont (commit `90c23a8`, `game.ts`,
+  `events.endTurn()` depuis `onBegin`). Engine vert (127 tests). Détail dans QUIRKS.
+
+### Prochaine chose à creuser
+- Suite P3.2 : brancher `aiStep` dans le composant solo (loop UI côté client), câbler le
+  mapping difficulté (`solo/difficulty.ts`) → `standThreshold`.
+
+### Notes pour future Claude
+- `boardgame.io/client` n'exporte pas `ClientState` → `aiStep` type un sous-ensemble
+  minimal maison (`PlayerState | OpponentView`), pas d'import du type interne.
+
+---
+
 ## 2026-06-13 — Outillage CI livré + opérationnel ★
 
 ### Dernière chose faite
